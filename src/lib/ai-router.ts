@@ -114,7 +114,7 @@ export const CATEGORIES: Record<string, CategoryConfig> = {
     response:
       "Hafiy spent 4+ years at Telekom Malaysia in progressively senior engineering roles — starting as a Trainee, moving to Network Geospatial Viz Solution Engineer, and most recently Visualisation & Software Engineer. His work spanned production data pipeline engineering, geospatial analytics, full-stack development, and integrating ML outputs into analytics platforms processing data from 3M+ customers.",
     phrases: [
-      { text: "work experience", weight: 4.5 },
+      { text: "work experience", weight: 5.5 },
       { text: "where has hafiy worked", weight: 4 },
       { text: "career history", weight: 4 },
       { text: "work history", weight: 4 },
@@ -189,3 +189,62 @@ export const CATEGORIES: Record<string, CategoryConfig> = {
     ],
   },
 };
+
+const RECRUITER_PREFIXES = [
+  "tell me",
+  "what is",
+  "can you",
+  "describe",
+  "how has",
+  "how can",
+];
+
+// Normalize raw score against a cap of 8.
+// A score of 8+ raw = 1.0 confidence.
+// If a routing test fails (canned case routes to "ai"), increase phrase weights
+// for that category — do not change the 0.75 threshold.
+function scoreCategory(input: string, config: CategoryConfig): number {
+  const lower = input.toLowerCase();
+  let raw = 0;
+
+  for (const phrase of config.phrases) {
+    if (lower.includes(phrase.text)) raw += phrase.weight;
+  }
+  for (const kw of config.keywords) {
+    if (lower.includes(kw.text)) raw += kw.weight;
+  }
+
+  const startsWithRecruiter = RECRUITER_PREFIXES.some((prefix) =>
+    lower.trimStart().startsWith(prefix)
+  );
+  if (startsWithRecruiter) raw *= 1.2;
+
+  if (input.length > 140) raw *= 0.7;
+  else if (input.length > 80) raw *= 0.85;
+
+  return Math.min(raw / 8, 1);
+}
+
+export function routeQuestion(input: string): RouterResult {
+  if (isVetoed(input)) return { source: "ai" };
+
+  const scores = Object.entries(CATEGORIES).map(([category, config]) => ({
+    category,
+    score: scoreCategory(input, config),
+  }));
+
+  scores.sort((a, b) => b.score - a.score);
+
+  const top = scores[0];
+  const second = scores[1];
+
+  if (top.score >= 0.75 && top.score - second.score >= 0.15) {
+    return {
+      source: "canned",
+      category: top.category,
+      response: CATEGORIES[top.category].response,
+    };
+  }
+
+  return { source: "ai" };
+}
