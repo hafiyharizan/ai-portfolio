@@ -60,7 +60,7 @@ export const CATEGORIES: Record<string, CategoryConfig> = {
       { text: "strongest skill", weight: 4 },
       { text: "technical skill", weight: 4 },
       { text: "best at", weight: 3.5 },
-      { text: "what skills", weight: 3 },
+      { text: "what skills", weight: 4.5 },
       { text: "what can he do", weight: 3 },
     ],
     keywords: [

@@ -1,75 +1,116 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { SendHorizontal, Sparkles } from "lucide-react";
+import { routeQuestion, type Message } from "@/lib/ai-router";
 
 const SUGGESTED_QUESTIONS = [
-  "What's Hafiy's strongest technical skill?",
-  "Tell me about the DREAM project",
-  "What makes Hafiy a good fit for a data engineering role?",
-  "What personal projects has Hafiy built?",
+  "Tell me about Hafiy",
+  "What projects has Hafiy built?",
+  "What skills does Hafiy have?",
+  "Why should we hire Hafiy?",
 ];
-
-const CANNED_RESPONSES: Record<string, string> = {
-  skill:
-    "Hafiy's strongest technical skill is data engineering — specifically designing and building end-to-end ELT pipelines, scalable data platforms, and automated workflows using Python, SQL, and cloud services. He pairs this with strong full-stack development skills in React, Next.js, and TypeScript, making him equally comfortable building the frontend that consumes the data.",
-  dream:
-    "DREAM (Data Repository for Exploratory Analysis and Management) was a centralised data platform Hafiy designed at Telekom Malaysia. It featured automated ingestion, transformation, and API-based data access — reducing data preparation time from hours to minutes. The project showcased his ability to architect production-grade data systems that serve both analysts and downstream applications.",
-  fit: "Hafiy brings 4+ years of hands-on experience building production data pipelines processing millions of records daily. He's automated compliance reporting (100% on-time submissions), designed scalable data mart architectures, and integrated ML outputs into analytics workflows. His unique blend of software engineering and data engineering means he builds robust, maintainable systems — not just scripts.",
-  projects:
-    "Hafiy has built several personal projects including Salasilah (a family tree and genealogy app using Next.js and D3.js), ChoreJoy (a gamified family chore app with React and Node.js), FridgeBoard (a household organization hub as a PWA), an Expense Tracker with rich analytics dashboards, and ApplyAI — an AI-powered job application assistant leveraging the OpenAI API.",
-};
-
-function getResponse(input: string): string {
-  const lower = input.toLowerCase();
-  if (lower.includes("skill") || lower.includes("strongest") || lower.includes("best at")) {
-    return CANNED_RESPONSES.skill;
-  }
-  if (lower.includes("dream") || lower.includes("data repository")) {
-    return CANNED_RESPONSES.dream;
-  }
-  if (
-    lower.includes("fit") ||
-    lower.includes("data engineering role") ||
-    lower.includes("why") ||
-    lower.includes("hire") ||
-    lower.includes("good")
-  ) {
-    return CANNED_RESPONSES.fit;
-  }
-  if (
-    lower.includes("project") ||
-    lower.includes("built") ||
-    lower.includes("personal") ||
-    lower.includes("portfolio")
-  ) {
-    return CANNED_RESPONSES.projects;
-  }
-  return "Hafiy is a software and data engineer based in Perth, Australia with 4+ years of experience across full-stack development, data engineering, analytics platforms, and AI-enabled solutions. He's passionate about building scalable, well-crafted systems. Feel free to ask about his skills, projects, or experience!";
-}
 
 export function AskAI() {
   const [input, setInput] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
   const [response, setResponse] = useState("");
+  const [streamingText, setStreamingText] = useState("");
+  const [isStreaming, setIsStreaming] = useState(false);
+  const [responseSource, setResponseSource] = useState<"canned" | "ai" | null>(null);
+  const [history, setHistory] = useState<Message[]>([]);
+  const abortRef = useRef<AbortController | null>(null);
 
   const handleSubmit = useCallback(
-    (question?: string) => {
-      const q = question || input;
-      if (!q.trim() || isLoading) return;
+    async (question?: string) => {
+      const q = question ?? input;
+      if (!q.trim() || isStreaming) return;
 
-      setInput(q);
-      setIsLoading(true);
+      // Clear transient state before each new submission
+      setStreamingText("");
+      setIsStreaming(false);
+      setResponseSource(null);
       setResponse("");
 
-      setTimeout(() => {
-        setResponse(getResponse(q));
-        setIsLoading(false);
-      }, 1500);
+      // Cancel any in-flight request from a previous submission
+      abortRef.current?.abort();
+
+      const result = routeQuestion(q);
+
+      if (result.source === "canned") {
+        setResponseSource("canned");
+        setTimeout(() => {
+          const answer = result.response!;
+          setResponse(answer);
+          setHistory((prev) =>
+            [
+              ...prev,
+              { role: "user" as const, content: q },
+              { role: "assistant" as const, content: answer },
+            ].slice(-6)
+          );
+        }, 1500);
+        return;
+      }
+
+      // Real AI path
+      setIsStreaming(true);
+      setResponseSource("ai");
+
+      const controller = new AbortController();
+      abortRef.current = controller;
+
+      try {
+        const res = await fetch("/api/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message: q, history }),
+          signal: controller.signal,
+        });
+
+        if (!res.ok || !res.body) {
+          setResponse("Sorry, something went wrong. Please try again.");
+          setIsStreaming(false);
+          return;
+        }
+
+        const reader = res.body.getReader();
+        const decoder = new TextDecoder();
+        let assembled = "";
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          const chunk = decoder.decode(value, { stream: true });
+          assembled += chunk;
+          setStreamingText(assembled);
+        }
+
+        // Commit to response only when stream is complete
+        setResponse(assembled);
+        setStreamingText("");
+        setIsStreaming(false);
+        setHistory((prev) =>
+          [
+            ...prev,
+            { role: "user" as const, content: q },
+            { role: "assistant" as const, content: assembled },
+          ].slice(-6)
+        );
+      } catch (err: unknown) {
+        if (err instanceof Error && err.name === "AbortError") return;
+        setResponse("Sorry, something went wrong. Please try again.");
+        setIsStreaming(false);
+      }
     },
-    [input, isLoading]
+    [input, isStreaming, history]
   );
+
+  // isLoading is true during the canned delay or while the AI stream hasn't started yet
+  const isLoading =
+    isStreaming ||
+    (responseSource === "canned" && !response);
+  const displayText = streamingText || response;
 
   return (
     <section
@@ -153,7 +194,7 @@ export function AskAI() {
             {/* Submit button */}
             <button
               onClick={() => handleSubmit()}
-              disabled={!input.trim() || isLoading}
+              disabled={!input.trim() || isStreaming}
               className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-accent text-white transition-all duration-200 hover:bg-accent-light disabled:opacity-40 disabled:cursor-not-allowed"
               aria-label="Send question"
             >
@@ -177,7 +218,7 @@ export function AskAI() {
                 setInput(question);
                 handleSubmit(question);
               }}
-              disabled={isLoading}
+              disabled={isStreaming}
               className="rounded-full border border-border bg-card px-4 py-2 text-sm text-muted transition-all duration-200 hover:border-accent-light hover:text-accent-light disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {question}
@@ -187,7 +228,7 @@ export function AskAI() {
 
         {/* Response area */}
         <AnimatePresence mode="wait">
-          {(isLoading || response) && (
+          {(isLoading || displayText) && (
             <motion.div
               className="mt-8 rounded-2xl border border-border bg-card p-6"
               initial={{ opacity: 0, y: 12 }}
@@ -195,7 +236,7 @@ export function AskAI() {
               exit={{ opacity: 0, y: -8 }}
               transition={{ duration: 0.35 }}
             >
-              {isLoading ? (
+              {isLoading && !displayText ? (
                 <div
                   className="flex items-center gap-1.5"
                   aria-label="Loading response"
@@ -218,14 +259,21 @@ export function AskAI() {
                   />
                 </div>
               ) : (
-                <motion.p
-                  className="leading-relaxed text-muted"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.4 }}
-                >
-                  {response}
-                </motion.p>
+                <div className="flex items-start justify-between gap-4">
+                  <motion.p
+                    className="leading-relaxed text-muted"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.4 }}
+                  >
+                    {displayText}
+                  </motion.p>
+                  {responseSource === "ai" && (
+                    <span className="shrink-0 rounded-full bg-accent/10 px-2 py-0.5 text-xs text-accent-light">
+                      AI
+                    </span>
+                  )}
+                </div>
               )}
             </motion.div>
           )}
