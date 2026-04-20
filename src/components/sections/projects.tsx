@@ -6,8 +6,7 @@ import {
   TreePine,
   Sparkles,
   LayoutDashboard,
-  Wallet,
-  Brain,
+  Fish,
   Database,
   Server,
   Map,
@@ -19,6 +18,7 @@ import {
 import { SectionHeading } from "@/components/ui/section-heading";
 import { Badge } from "@/components/ui/badge";
 import { PERSONAL_PROJECTS, PROFESSIONAL_PROJECTS } from "@/lib/constants";
+import { EASE_OUT_QUART } from "@/lib/motion";
 
 // ---------------------------------------------------------------------------
 // Icon mapping
@@ -27,8 +27,7 @@ const ICON_MAP: Record<string, LucideIcon> = {
   tree: TreePine,
   sparkles: Sparkles,
   "layout-dashboard": LayoutDashboard,
-  wallet: Wallet,
-  brain: Brain,
+  fish: Fish,
   database: Database,
   server: Server,
   map: Map,
@@ -50,7 +49,7 @@ const cardVariants = {
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] as [number, number, number, number] },
+    transition: { duration: 0.5, ease: EASE_OUT_QUART },
   },
 };
 

@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { Quote } from "lucide-react";
+import { EASE_OUT_QUART } from "@/lib/motion";
 import { TESTIMONIALS } from "@/lib/constants";
 import { SectionHeading } from "@/components/ui/section-heading";
 
@@ -13,7 +14,7 @@ const cardVariants = {
     transition: {
       delay: i * 0.15,
       duration: 0.5,
-      ease: [0.25, 0.46, 0.45, 0.94] as const,
+      ease: EASE_OUT_QUART,
     },
   }),
 };

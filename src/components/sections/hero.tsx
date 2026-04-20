@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown } from "lucide-react";
+import { EASE_OUT_QUART } from "@/lib/motion";
 import { SITE_CONFIG } from "@/lib/constants";
 
 const name = SITE_CONFIG.name.toUpperCase();
@@ -17,7 +18,7 @@ const letterVariants = {
     transition: {
       delay: 0.3 + i * 0.04,
       duration: 0.5,
-      ease: [0.25, 0.46, 0.45, 0.94] as const,
+      ease: EASE_OUT_QUART,
     },
   }),
 };

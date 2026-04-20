@@ -1,9 +1,14 @@
 "use client";
 
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { SendHorizontal, Sparkles } from "lucide-react";
-import { routeQuestion, type Message } from "@/lib/ai-router";
+import { SendHorizontal, Sparkles, Loader2 } from "lucide-react";
+import { routeQuestion } from "@/lib/ai-router";
+
+interface Message {
+  role: "user" | "model";
+  text: string;
+}
 
 const SUGGESTED_QUESTIONS = [
   "Tell me about Hafiy",
@@ -12,50 +17,55 @@ const SUGGESTED_QUESTIONS = [
   "Why should we hire Hafiy?",
 ];
 
+const INITIAL_MESSAGE: Message = {
+  role: "model",
+  text: "Hi! I'm Hafiy's AI Twin. Ask me anything about his projects, skills, or experience.",
+};
+
 export function AskAI() {
+  const [messages, setMessages] = useState<Message[]>([INITIAL_MESSAGE]);
   const [input, setInput] = useState("");
-  const [response, setResponse] = useState("");
-  const [streamingText, setStreamingText] = useState("");
   const [isStreaming, setIsStreaming] = useState(false);
-  const [responseSource, setResponseSource] = useState<"canned" | "ai" | null>(null);
-  const [history, setHistory] = useState<Message[]>([]);
   const abortRef = useRef<AbortController | null>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
 
   const handleSubmit = useCallback(
     async (question?: string) => {
-      const q = question ?? input;
-      if (!q.trim() || isStreaming) return;
+      const q = (question ?? input).trim();
+      if (!q || isStreaming) return;
 
-      // Clear transient state before each new submission
-      setStreamingText("");
-      setIsStreaming(false);
-      setResponseSource(null);
-      setResponse("");
+      setInput("");
 
-      // Cancel any in-flight request from a previous submission
+      // Capture history before adding the new user message
+      const historyForApi = messages
+        .filter((m) => m.text)
+        .map((m) => ({ role: m.role === "user" ? "user" : "assistant", content: m.text }))
+        .slice(-6);
+
+      setMessages((prev) => [...prev, { role: "user", text: q }]);
+
       abortRef.current?.abort();
-
       const result = routeQuestion(q);
 
       if (result.source === "canned") {
-        setResponseSource("canned");
-        setTimeout(() => {
-          const answer = result.response!;
-          setResponse(answer);
-          setHistory((prev) =>
-            [
-              ...prev,
-              { role: "user" as const, content: q },
-              { role: "assistant" as const, content: answer },
-            ].slice(-6)
-          );
-        }, 1500);
+        setMessages((prev) => [...prev, { role: "model", text: "" }]);
+        setIsStreaming(true);
+        await new Promise((r) => setTimeout(r, 700));
+        setMessages((prev) => {
+          const updated = [...prev];
+          updated[updated.length - 1] = { role: "model", text: result.response! };
+          return updated;
+        });
+        setIsStreaming(false);
         return;
       }
 
-      // Real AI path
+      setMessages((prev) => [...prev, { role: "model", text: "" }]);
       setIsStreaming(true);
-      setResponseSource("ai");
 
       const controller = new AbortController();
       abortRef.current = controller;
@@ -64,12 +74,20 @@ export function AskAI() {
         const res = await fetch("/api/chat", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ message: q, history }),
+          body: JSON.stringify({ message: q, history: historyForApi }),
           signal: controller.signal,
         });
 
         if (!res.ok || !res.body) {
-          setResponse("Sorry, something went wrong. Please try again.");
+          const errText = await res.text().catch(() => "");
+          setMessages((prev) => {
+            const updated = [...prev];
+            updated[updated.length - 1] = {
+              role: "model",
+              text: errText || "Sorry, something went wrong. Please try again.",
+            };
+            return updated;
+          });
           setIsStreaming(false);
           return;
         }
@@ -81,36 +99,29 @@ export function AskAI() {
         while (true) {
           const { done, value } = await reader.read();
           if (done) break;
-          const chunk = decoder.decode(value, { stream: true });
-          assembled += chunk;
-          setStreamingText(assembled);
+          assembled += decoder.decode(value, { stream: true });
+          setMessages((prev) => {
+            const updated = [...prev];
+            updated[updated.length - 1] = { role: "model", text: assembled };
+            return updated;
+          });
         }
-
-        // Commit to response only when stream is complete
-        setResponse(assembled);
-        setStreamingText("");
-        setIsStreaming(false);
-        setHistory((prev) =>
-          [
-            ...prev,
-            { role: "user" as const, content: q },
-            { role: "assistant" as const, content: assembled },
-          ].slice(-6)
-        );
       } catch (err: unknown) {
         if (err instanceof Error && err.name === "AbortError") return;
-        setResponse("Sorry, something went wrong. Please try again.");
+        setMessages((prev) => {
+          const updated = [...prev];
+          updated[updated.length - 1] = {
+            role: "model",
+            text: "Sorry, something went wrong. Please try again.",
+          };
+          return updated;
+        });
+      } finally {
         setIsStreaming(false);
       }
     },
-    [input, isStreaming, history]
+    [input, isStreaming, messages]
   );
-
-  // isLoading is true during the canned delay or while the AI stream hasn't started yet
-  const isLoading =
-    isStreaming ||
-    (responseSource === "canned" && !response);
-  const displayText = streamingText || response;
 
   return (
     <section
@@ -118,7 +129,6 @@ export function AskAI() {
       className="relative overflow-hidden py-24 sm:py-32"
       aria-label="Ask AI about Hafiy"
     >
-      {/* Radial gradient background accent */}
       <div
         className="pointer-events-none absolute inset-0"
         aria-hidden="true"
@@ -148,136 +158,118 @@ export function AskAI() {
           </p>
         </motion.div>
 
-        {/* Input card */}
+        {/* Chat card */}
         <motion.div
-          className="relative rounded-2xl border border-border bg-card p-2"
+          className="overflow-hidden rounded-2xl border border-border bg-card"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-80px" }}
           transition={{ duration: 0.5, delay: 0.15 }}
         >
-          <div className="flex items-center gap-3">
-            {/* Animated gradient orb */}
-            <motion.div
-              className="ml-2 flex h-8 w-8 shrink-0 items-center justify-center rounded-full"
-              style={{
-                background:
-                  "linear-gradient(135deg, var(--gradient-start), var(--gradient-end))",
-              }}
-              animate={{
-                scale: [1, 1.15, 1],
-                boxShadow: [
-                  "0 0 12px rgba(139,92,246,0.3)",
-                  "0 0 24px rgba(37,99,235,0.4)",
-                  "0 0 12px rgba(139,92,246,0.3)",
-                ],
-              }}
-              transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-              aria-hidden="true"
-            >
-              <Sparkles className="h-4 w-4 text-white" />
-            </motion.div>
+          {/* Message history */}
+          <div className="flex h-[360px] flex-col gap-4 overflow-y-auto p-6">
+            <AnimatePresence initial={false}>
+              {messages.map((msg, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.25 }}
+                  className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
+                >
+                  <div
+                    className={`max-w-[80%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
+                      msg.role === "user"
+                        ? "rounded-tr-none bg-accent text-white"
+                        : "rounded-tl-none border border-border bg-background text-foreground"
+                    }`}
+                  >
+                    {msg.text || (isStreaming && i === messages.length - 1) ? (
+                      msg.text || (
+                        <div className="flex items-center gap-1" role="status" aria-label="Thinking">
+                          {[0, 0.2, 0.4].map((delay, j) => (
+                            <motion.span
+                              key={j}
+                              className="h-1.5 w-1.5 rounded-full bg-muted-foreground"
+                              animate={{ opacity: [0.3, 1, 0.3] }}
+                              transition={{ duration: 1, repeat: Infinity, delay }}
+                            />
+                          ))}
+                        </div>
+                      )
+                    ) : null}
+                  </div>
+                </motion.div>
+              ))}
+            </AnimatePresence>
+            <div ref={messagesEndRef} />
+          </div>
 
-            {/* Input */}
-            <input
-              type="text"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") handleSubmit();
-              }}
-              placeholder="Ask me anything about Hafiy..."
-              className="min-w-0 flex-1 bg-transparent py-3 text-foreground placeholder:text-muted-foreground focus:outline-none"
-              aria-label="Ask a question about Hafiy"
-            />
+          {/* Suggested questions */}
+          <div className="flex flex-wrap gap-2 border-t border-border px-6 py-4">
+            {SUGGESTED_QUESTIONS.map((q) => (
+              <button
+                key={q}
+                onClick={() => handleSubmit(q)}
+                disabled={isStreaming}
+                className="rounded-full border border-border bg-card px-3 py-1.5 text-xs text-muted transition-all duration-200 hover:border-accent-light hover:text-accent-light disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {q}
+              </button>
+            ))}
+          </div>
 
-            {/* Submit button */}
-            <button
-              onClick={() => handleSubmit()}
-              disabled={!input.trim() || isStreaming}
-              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-accent text-white transition-all duration-200 hover:bg-accent-light disabled:opacity-40 disabled:cursor-not-allowed"
-              aria-label="Send question"
-            >
-              <SendHorizontal className="h-4 w-4" />
-            </button>
+          {/* Input */}
+          <div className="border-t border-border p-4">
+            <div className="flex items-center gap-3 rounded-xl border border-border bg-background px-4 py-2">
+              <motion.div
+                className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full"
+                style={{
+                  background:
+                    "linear-gradient(135deg, var(--gradient-start), var(--gradient-end))",
+                }}
+                animate={{
+                  scale: [1, 1.15, 1],
+                  boxShadow: [
+                    "0 0 8px rgba(139,92,246,0.3)",
+                    "0 0 16px rgba(37,99,235,0.4)",
+                    "0 0 8px rgba(139,92,246,0.3)",
+                  ],
+                }}
+                transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                aria-hidden="true"
+              >
+                <Sparkles className="h-3 w-3 text-white" />
+              </motion.div>
+
+              <input
+                type="text"
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") handleSubmit();
+                }}
+                placeholder="Ask me anything about Hafiy..."
+                className="min-w-0 flex-1 bg-transparent py-1.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none"
+                aria-label="Ask a question about Hafiy"
+                disabled={isStreaming}
+              />
+
+              <button
+                onClick={() => handleSubmit()}
+                disabled={!input.trim() || isStreaming}
+                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-accent text-white transition-all duration-200 hover:bg-accent-light disabled:cursor-not-allowed disabled:opacity-40"
+                aria-label="Send question"
+              >
+                {isStreaming ? (
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                ) : (
+                  <SendHorizontal className="h-3.5 w-3.5" />
+                )}
+              </button>
+            </div>
           </div>
         </motion.div>
-
-        {/* Suggested questions */}
-        <motion.div
-          className="mt-4 flex flex-wrap justify-center gap-2"
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true, margin: "-60px" }}
-          transition={{ duration: 0.5, delay: 0.3 }}
-        >
-          {SUGGESTED_QUESTIONS.map((question) => (
-            <button
-              key={question}
-              onClick={() => {
-                setInput(question);
-                handleSubmit(question);
-              }}
-              disabled={isStreaming}
-              className="rounded-full border border-border bg-card px-4 py-2 text-sm text-muted transition-all duration-200 hover:border-accent-light hover:text-accent-light disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {question}
-            </button>
-          ))}
-        </motion.div>
-
-        {/* Response area */}
-        <AnimatePresence mode="wait">
-          {(isLoading || displayText) && (
-            <motion.div
-              className="mt-8 rounded-2xl border border-border bg-card p-6"
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
-              transition={{ duration: 0.35 }}
-            >
-              {isLoading && !displayText ? (
-                <div
-                  className="flex items-center gap-1.5"
-                  aria-label="Loading response"
-                  role="status"
-                >
-                  <motion.span
-                    className="h-2 w-2 rounded-full bg-accent-light"
-                    animate={{ opacity: [0.3, 1, 0.3] }}
-                    transition={{ duration: 1, repeat: Infinity, delay: 0 }}
-                  />
-                  <motion.span
-                    className="h-2 w-2 rounded-full bg-accent-light"
-                    animate={{ opacity: [0.3, 1, 0.3] }}
-                    transition={{ duration: 1, repeat: Infinity, delay: 0.2 }}
-                  />
-                  <motion.span
-                    className="h-2 w-2 rounded-full bg-accent-light"
-                    animate={{ opacity: [0.3, 1, 0.3] }}
-                    transition={{ duration: 1, repeat: Infinity, delay: 0.4 }}
-                  />
-                </div>
-              ) : (
-                <div className="flex items-start justify-between gap-4">
-                  <motion.p
-                    className="leading-relaxed text-muted"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ duration: 0.4 }}
-                  >
-                    {displayText}
-                  </motion.p>
-                  {responseSource === "ai" && (
-                    <span className="shrink-0 rounded-full bg-accent/10 px-2 py-0.5 text-xs text-accent-light">
-                      AI
-                    </span>
-                  )}
-                </div>
-              )}
-            </motion.div>
-          )}
-        </AnimatePresence>
       </div>
     </section>
   );

@@ -29,17 +29,17 @@ export const PERSONAL_PROJECTS = [
     tags: ["Next.js", "TypeScript", "PostgreSQL", "D3.js", "Tailwind CSS"],
     icon: "tree",
     color: "#10b981",
-    href: "#",
+    href: "https://salasilah.my/",
   },
   {
-    name: "ChoreJoy",
+    name: "ChoreQuest",
     tagline: "Gamified Family Chore App",
     description:
       "A playful task management platform that turns household chores into a game. Families earn points, unlock rewards, and build streaks together. Built with engagement loops and reward systems that keep everyone motivated.",
     tags: ["React", "Node.js", "MongoDB", "Framer Motion"],
     icon: "sparkles",
     color: "#f59e0b",
-    href: "#",
+    href: "https://chorequest-nu.vercel.app/",
   },
   {
     name: "FridgeBoard",
@@ -49,27 +49,17 @@ export const PERSONAL_PROJECTS = [
     tags: ["Next.js", "Supabase", "Tailwind CSS", "PWA"],
     icon: "layout-dashboard",
     color: "#3b82f6",
-    href: "#",
+    href: "https://fridgeboard.netlify.app/",
   },
   {
-    name: "Expense Tracker",
-    tagline: "Personal Finance Dashboard",
+    name: "FishScout",
+    tagline: "Fishing Intelligence MVP",
     description:
-      "A sleek expense tracking app with rich analytics dashboards, category-driven breakdowns, and spending trend visualization. Designed for clarity and daily usability.",
-    tags: ["React", "Chart.js", "Node.js", "PostgreSQL"],
-    icon: "wallet",
-    color: "#8b5cf6",
-    href: "#",
-  },
-  {
-    name: "ApplyAI",
-    tagline: "AI-Powered Job Application Assistant",
-    description:
-      "An intelligent platform that leverages AI to streamline job applications. Features smart resume tailoring, cover letter generation, and application tracking with prompt-engineered workflows.",
-    tags: ["Next.js", "OpenAI API", "Python", "Tailwind CSS"],
-    icon: "brain",
-    color: "#ec4899",
-    href: "#",
+      "A production-minded MVP for fishing intelligence. Helps anglers discover fishing spots, post catch reports, follow community activity, save promising water, and surface best-time-to-fish insights from recent reports.",
+    tags: ["Next.js", "TypeScript", "Supabase", "Tailwind CSS"],
+    icon: "fish",
+    color: "#06b6d4",
+    href: "https://fishos-seven.vercel.app/",
   },
 ] as const;
 
