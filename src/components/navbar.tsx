@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { SITE_CONFIG } from "@/lib/constants";
 import { ThemePicker } from "@/components/theme-picker";
 
@@ -13,6 +13,17 @@ const NAV_ITEMS = [
 
 export function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [emailPrompt, setEmailPrompt] = useState(false);
+  const emailRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!emailPrompt) return;
+    const handler = (e: MouseEvent) => {
+      if (!emailRef.current?.contains(e.target as Node)) setEmailPrompt(false);
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [emailPrompt]);
 
   return (
     <header
@@ -81,27 +92,77 @@ export function Navbar() {
         <ThemePicker />
 
         {/* Open to work status */}
-        <a
-          href={`mailto:${SITE_CONFIG.email}`}
-          className="inline-flex items-center gap-2 rounded-lg border px-3 py-1.5 transition-colors duration-200"
-          style={{
-            fontFamily: "var(--font-jb-mono)",
-            fontSize: 11,
-            color: "var(--muted)",
-            borderColor: "var(--line-strong)",
-            background: "var(--bg-soft)",
-          }}
-        >
-          <span
-            className="h-1.5 w-1.5 rounded-full"
+        <div className="relative" ref={emailRef}>
+          <button
+            type="button"
+            onClick={() => setEmailPrompt((p) => !p)}
+            className="inline-flex items-center gap-2 rounded-lg border px-3 py-1.5 transition-colors duration-200"
             style={{
-              background: "var(--ok)",
-              boxShadow: "0 0 10px var(--ok)",
-              animation: "pulse-ok 2s ease-in-out infinite",
+              fontFamily: "var(--font-jb-mono)",
+              fontSize: 11,
+              color: "var(--muted)",
+              borderColor: emailPrompt ? "var(--accent-line)" : "var(--line-strong)",
+              background: "var(--bg-soft)",
             }}
-          />
-          Open to work
-        </a>
+          >
+            <span
+              className="h-1.5 w-1.5 rounded-full"
+              style={{
+                background: "var(--ok)",
+                boxShadow: "0 0 10px var(--ok)",
+                animation: "pulse-ok 2s ease-in-out infinite",
+              }}
+            />
+            Open to work
+          </button>
+
+          {emailPrompt && (
+            <div
+              className="absolute right-0 mt-2 rounded-xl border p-4"
+              style={{
+                top: "100%",
+                width: 220,
+                zIndex: 50,
+                background: "rgba(14,14,18,0.97)",
+                borderColor: "var(--line-strong)",
+                backdropFilter: "blur(16px)",
+                boxShadow: "0 8px 32px rgba(0,0,0,0.5)",
+              }}
+            >
+              <p style={{ fontFamily: "var(--font-jb-mono)", fontSize: 11, color: "var(--muted)", marginBottom: 12, lineHeight: 1.5 }}>
+                Start an email to Hafiy?
+              </p>
+              <div className="flex gap-2">
+                <a
+                  href={`mailto:${SITE_CONFIG.email}`}
+                  onClick={() => setEmailPrompt(false)}
+                  className="flex-1 rounded-lg py-1.5 text-center transition-all duration-150"
+                  style={{
+                    fontFamily: "var(--font-jb-mono)",
+                    fontSize: 11,
+                    background: "var(--accent)",
+                    color: "var(--accent-ink)",
+                  }}
+                >
+                  Yes, open
+                </a>
+                <button
+                  type="button"
+                  onClick={() => setEmailPrompt(false)}
+                  className="flex-1 rounded-lg border py-1.5 transition-all duration-150"
+                  style={{
+                    fontFamily: "var(--font-jb-mono)",
+                    fontSize: 11,
+                    borderColor: "var(--line-strong)",
+                    color: "var(--muted)",
+                  }}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
 
         {/* Mobile hamburger */}
         <button
