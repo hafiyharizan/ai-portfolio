@@ -107,8 +107,7 @@ export async function POST(req: NextRequest) {
     });
   } catch (err: unknown) {
     const status = (err as { status?: number }).status;
-    const errMessage =
-      err instanceof Error ? err.message : "AI request failed";
+    const errMessage = err instanceof Error ? err.message : "AI request failed";
     console.error("[chat/route]", status ?? "", errMessage);
     if (status === 429) {
       return new Response("Rate limit reached — please wait a moment and try again.", { status: 429 });

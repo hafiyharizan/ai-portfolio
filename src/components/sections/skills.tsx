@@ -6,9 +6,9 @@ import { SectionHeading } from "@/components/ui/section-heading";
 
 const CATEGORY_COLORS: Record<string, { bg: string; text: string }> = {
   Frontend: { bg: "bg-blue-500/10", text: "text-blue-400" },
-  Backend: { bg: "bg-emerald-500/10", text: "text-emerald-400" },
+  Backend: { bg: "bg-accent/10", text: "text-accent-light" },
   Databases: { bg: "bg-amber-500/10", text: "text-amber-400" },
-  "AI & Cloud": { bg: "bg-purple-500/10", text: "text-purple-400" },
+  "AI & Cloud": { bg: "bg-accent/10", text: "text-accent-light" },
   "Data & Viz": { bg: "bg-rose-500/10", text: "text-rose-400" },
   "DevOps & Tools": { bg: "bg-cyan-500/10", text: "text-cyan-400" },
 };

@@ -63,7 +63,7 @@ export function About() {
                 className="rounded-2xl p-[2px]"
                 style={{
                   background:
-                    "linear-gradient(135deg, var(--gradient-start), var(--gradient-end))",
+                    "linear-gradient(135deg, var(--accent), var(--accent-hot))",
                 }}
               >
                 <div className="relative h-72 w-60 overflow-hidden rounded-2xl sm:h-80 sm:w-68">
@@ -80,7 +80,7 @@ export function About() {
                 className="absolute -bottom-3 -right-3 h-6 w-6 rounded-full"
                 style={{
                   background:
-                    "linear-gradient(135deg, var(--gradient-start), var(--gradient-end))",
+                    "linear-gradient(135deg, var(--accent), var(--accent-hot))",
                 }}
                 aria-hidden="true"
               />

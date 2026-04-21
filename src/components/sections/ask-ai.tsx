@@ -40,7 +40,6 @@ export function AskAI() {
 
       setInput("");
 
-      // Capture history before adding the new user message
       const historyForApi = messages
         .filter((m) => m.text)
         .map((m) => ({ role: m.role === "user" ? "user" : "assistant", content: m.text }))
@@ -133,13 +132,11 @@ export function AskAI() {
         className="pointer-events-none absolute inset-0"
         aria-hidden="true"
         style={{
-          background:
-            "radial-gradient(ellipse 80% 50% at 50% 50%, rgba(109, 40, 217, 0.08), transparent)",
+          background: "radial-gradient(ellipse 80% 50% at 50% 50%, var(--accent-soft), transparent)",
         }}
       />
 
       <div className="relative z-10 mx-auto max-w-3xl px-6">
-        {/* Heading */}
         <motion.div
           className="mb-12 text-center"
           initial={{ opacity: 0, y: 20 }}
@@ -158,7 +155,6 @@ export function AskAI() {
           </p>
         </motion.div>
 
-        {/* Chat card */}
         <motion.div
           className="overflow-hidden rounded-2xl border border-border bg-card"
           initial={{ opacity: 0, y: 20 }}
@@ -166,7 +162,6 @@ export function AskAI() {
           viewport={{ once: true, margin: "-80px" }}
           transition={{ duration: 0.5, delay: 0.15 }}
         >
-          {/* Message history */}
           <div className="flex h-[360px] flex-col gap-4 overflow-y-auto p-6">
             <AnimatePresence initial={false}>
               {messages.map((msg, i) => (
@@ -180,9 +175,10 @@ export function AskAI() {
                   <div
                     className={`max-w-[80%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
                       msg.role === "user"
-                        ? "rounded-tr-none bg-accent text-white"
+                        ? "rounded-tr-none bg-accent"
                         : "rounded-tl-none border border-border bg-background text-foreground"
                     }`}
+                    style={msg.role === "user" ? { color: "var(--accent-ink)" } : undefined}
                   >
                     {msg.text || (isStreaming && i === messages.length - 1) ? (
                       msg.text || (
@@ -205,7 +201,6 @@ export function AskAI() {
             <div ref={messagesEndRef} />
           </div>
 
-          {/* Suggested questions */}
           <div className="flex flex-wrap gap-2 border-t border-border px-6 py-4">
             {SUGGESTED_QUESTIONS.map((q) => (
               <button
@@ -219,36 +214,23 @@ export function AskAI() {
             ))}
           </div>
 
-          {/* Input */}
           <div className="border-t border-border p-4">
             <div className="flex items-center gap-3 rounded-xl border border-border bg-background px-4 py-2">
               <motion.div
                 className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full"
-                style={{
-                  background:
-                    "linear-gradient(135deg, var(--gradient-start), var(--gradient-end))",
-                }}
-                animate={{
-                  scale: [1, 1.15, 1],
-                  boxShadow: [
-                    "0 0 8px rgba(139,92,246,0.3)",
-                    "0 0 16px rgba(37,99,235,0.4)",
-                    "0 0 8px rgba(139,92,246,0.3)",
-                  ],
-                }}
+                style={{ background: "linear-gradient(135deg, var(--accent), var(--accent-hot))" }}
+                animate={{ scale: [1, 1.15, 1] }}
                 transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
                 aria-hidden="true"
               >
-                <Sparkles className="h-3 w-3 text-white" />
+                <Sparkles className="h-3 w-3" style={{ color: "var(--accent-ink)" }} />
               </motion.div>
 
               <input
                 type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") handleSubmit();
-                }}
+                onKeyDown={(e) => { if (e.key === "Enter") handleSubmit(); }}
                 placeholder="Ask me anything about Hafiy..."
                 className="min-w-0 flex-1 bg-transparent py-1.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none"
                 aria-label="Ask a question about Hafiy"
@@ -258,7 +240,8 @@ export function AskAI() {
               <button
                 onClick={() => handleSubmit()}
                 disabled={!input.trim() || isStreaming}
-                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-accent text-white transition-all duration-200 hover:bg-accent-light disabled:cursor-not-allowed disabled:opacity-40"
+                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-accent transition-all duration-200 hover:bg-accent-light disabled:cursor-not-allowed disabled:opacity-40"
+                style={{ color: "var(--accent-ink)" }}
                 aria-label="Send question"
               >
                 {isStreaming ? (
