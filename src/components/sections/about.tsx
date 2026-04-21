@@ -1,7 +1,9 @@
 "use client";
 
 import { motion } from "framer-motion";
+import Image from "next/image";
 import { Briefcase, Database, FolderGit2, GraduationCap } from "lucide-react";
+import { EASE_OUT_QUART } from "@/lib/motion";
 import { SectionHeading } from "@/components/ui/section-heading";
 
 const stats = [
@@ -35,7 +37,7 @@ const fadeInUp = {
     transition: {
       delay: i * 0.1,
       duration: 0.5,
-      ease: [0.25, 0.46, 0.45, 0.94] as const,
+      ease: EASE_OUT_QUART,
     },
   }),
 };
@@ -57,26 +59,28 @@ export function About() {
             transition={{ duration: 0.6 }}
           >
             <div className="relative">
-              {/* Gradient border wrapper */}
               <div
                 className="rounded-2xl p-[2px]"
                 style={{
                   background:
-                    "linear-gradient(135deg, var(--gradient-start), var(--gradient-end))",
+                    "linear-gradient(135deg, var(--accent), var(--accent-hot))",
                 }}
               >
-                <div className="flex h-72 w-60 items-center justify-center rounded-2xl bg-card sm:h-80 sm:w-68">
-                  <span className="text-6xl font-bold text-muted-foreground/40 sm:text-7xl">
-                    HH
-                  </span>
+                <div className="relative h-72 w-60 overflow-hidden rounded-2xl sm:h-80 sm:w-68">
+                  <Image
+                    src="/avatar.png"
+                    alt="Hafiy Harizan"
+                    fill
+                    className="object-cover object-top"
+                    priority
+                  />
                 </div>
               </div>
-              {/* Decorative accent dot */}
               <div
                 className="absolute -bottom-3 -right-3 h-6 w-6 rounded-full"
                 style={{
                   background:
-                    "linear-gradient(135deg, var(--gradient-start), var(--gradient-end))",
+                    "linear-gradient(135deg, var(--accent), var(--accent-hot))",
                 }}
                 aria-hidden="true"
               />

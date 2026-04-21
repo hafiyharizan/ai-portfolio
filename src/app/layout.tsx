@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import Script from "next/script";
+import { Geist, JetBrains_Mono } from "next/font/google";
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
+import { Atmosphere } from "@/components/atmosphere";
+import { DEFAULT_THEME, THEME_NAMES, THEME_STORAGE_KEY } from "@/lib/theme";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -9,13 +12,14 @@ const geistSans = Geist({
   subsets: ["latin"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const jbMono = JetBrains_Mono({
+  variable: "--font-jb-mono",
   subsets: ["latin"],
+  weight: ["400", "500", "600"],
 });
 
 export const metadata: Metadata = {
-  title: "Hafiy Harizan — Software & Data Engineer | Perth, Australia",
+  title: "Hafiy Harizan — Software Engineer",
   description:
     "Perth-based software engineer and data & analytics engineer with 4+ years of experience across full stack development, data engineering, analytics platforms, automation, and AI-enabled solutions.",
   keywords: [
@@ -48,22 +52,53 @@ export const metadata: Metadata = {
     description:
       "Building scalable data platforms and intelligent applications. 4+ years across full stack, data engineering, analytics, and AI.",
   },
-  robots: {
-    index: true,
-    follow: true,
-  },
+  robots: { index: true, follow: true },
 };
+
+const themeInitScript = `(() => {
+  try {
+    const themes = ${JSON.stringify(THEME_NAMES)};
+    const stored = window.localStorage.getItem("${THEME_STORAGE_KEY}");
+    if (stored && stored.startsWith("custom:")) {
+      const hue = parseFloat(stored.slice(7));
+      if (!isNaN(hue)) {
+        const r = document.documentElement;
+        const hh = (hue + 15) % 360;
+        r.dataset.theme = "custom";
+        r.style.setProperty("--accent",       "oklch(0.72 0.18 " + hue + ")");
+        r.style.setProperty("--accent-light", "oklch(0.78 0.16 " + hue + ")");
+        r.style.setProperty("--accent-hot",   "oklch(0.76 0.22 " + hh + ")");
+        r.style.setProperty("--accent-soft",  "oklch(0.72 0.18 " + hue + " / 0.16)");
+        r.style.setProperty("--accent-line",  "oklch(0.72 0.18 " + hue + " / 0.42)");
+        r.style.setProperty("--accent-glow",  "oklch(0.72 0.18 " + hue + " / 0.16)");
+        r.style.setProperty("--accent-ink",   "oklch(0.1 0.04 " + hue + ")");
+      }
+    } else {
+      const theme = stored && themes.includes(stored) ? stored : "${DEFAULT_THEME}";
+      document.documentElement.dataset.theme = theme;
+    }
+  } catch {
+    document.documentElement.dataset.theme = "${DEFAULT_THEME}";
+  }
+})();`;
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
+    <html
+      lang="en"
+      className={`${geistSans.variable} ${jbMono.variable}`}
+      data-theme={DEFAULT_THEME}
+      suppressHydrationWarning
+    >
       <body className="grain min-h-screen bg-background text-foreground antialiased">
+        <Script id="theme-init" strategy="beforeInteractive">
+          {themeInitScript}
+        </Script>
+        <Atmosphere />
         <Navbar />
-        <main>{children}</main>
+        <main className="relative z-[2]">{children}</main>
         <Footer />
       </body>
     </html>

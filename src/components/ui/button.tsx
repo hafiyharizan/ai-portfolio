@@ -1,4 +1,8 @@
-import { type ButtonHTMLAttributes, type ReactNode } from "react";
+import {
+  type ButtonHTMLAttributes,
+  type CSSProperties,
+  type ReactNode,
+} from "react";
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: "primary" | "outline";
@@ -6,10 +10,13 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   className?: string;
 }
 
+type ButtonVariant = NonNullable<ButtonProps["variant"]>;
+
 export function Button({
   variant = "primary",
   children,
   className = "",
+  style,
   ...props
 }: ButtonProps) {
   const base =
@@ -17,14 +24,22 @@ export function Button({
 
   const variants = {
     primary:
-      "bg-gradient-to-r from-accent to-blue-600 text-white shadow-lg shadow-accent/25 hover:shadow-accent/40 hover:brightness-110",
+      "text-white shadow-lg shadow-accent/25 hover:shadow-accent/40 hover:brightness-110",
     outline:
       "border border-border text-muted-foreground hover:border-accent hover:text-accent-light",
+  };
+
+  const variantStyles: Record<ButtonVariant, CSSProperties> = {
+    primary: {
+      backgroundImage: "linear-gradient(90deg, var(--accent), var(--accent-hot))",
+    },
+    outline: {},
   };
 
   return (
     <button
       className={`${base} ${variants[variant]} ${className}`}
+      style={{ ...variantStyles[variant], ...style }}
       {...props}
     >
       {children}

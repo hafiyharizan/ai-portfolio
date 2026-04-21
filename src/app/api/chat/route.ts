@@ -9,11 +9,11 @@ import {
 } from "@/lib/constants";
 
 const client = new OpenAI({
-  baseURL: "https://openrouter.ai/api/v1",
-  apiKey: process.env.OPENROUTER_API_KEY ?? "",
+  baseURL: "https://generativelanguage.googleapis.com/v1beta/openai/",
+  apiKey: process.env.GEMINI_API_KEY ?? "",
 });
 
-const MODEL = process.env.OPENROUTER_MODEL ?? "openai/gpt-oss-120b:free";
+const MODEL = process.env.GEMINI_MODEL ?? "gemini-2.0-flash-preview-exp";
 
 const SYSTEM_PROMPT = `You are an assistant answering questions about Hafiy Harizan, a software and data engineer based in Perth, Australia.
 Do not claim to be Hafiy. Refer to him in the third person.
@@ -80,28 +80,38 @@ export async function POST(req: NextRequest) {
     .filter(isValidMessage)
     .slice(-6);
 
-  const stream = await client.chat.completions.create({
-    model: MODEL,
-    stream: true,
-    messages: [
-      { role: "system", content: SYSTEM_PROMPT },
-      ...validHistory,
-      { role: "user", content: message },
-    ],
-  });
+  try {
+    const stream = await client.chat.completions.create({
+      model: MODEL,
+      stream: true,
+      messages: [
+        { role: "system", content: SYSTEM_PROMPT },
+        ...validHistory,
+        { role: "user", content: message },
+      ],
+    });
 
-  const encoder = new TextEncoder();
-  const readable = new ReadableStream({
-    async start(controller) {
-      for await (const chunk of stream) {
-        const text = chunk.choices[0]?.delta?.content ?? "";
-        if (text) controller.enqueue(encoder.encode(text));
-      }
-      controller.close();
-    },
-  });
+    const encoder = new TextEncoder();
+    const readable = new ReadableStream({
+      async start(controller) {
+        for await (const chunk of stream) {
+          const text = chunk.choices[0]?.delta?.content ?? "";
+          if (text) controller.enqueue(encoder.encode(text));
+        }
+        controller.close();
+      },
+    });
 
-  return new Response(readable, {
-    headers: { "Content-Type": "text/plain; charset=utf-8" },
-  });
+    return new Response(readable, {
+      headers: { "Content-Type": "text/plain; charset=utf-8" },
+    });
+  } catch (err: unknown) {
+    const status = (err as { status?: number }).status;
+    const errMessage = err instanceof Error ? err.message : "AI request failed";
+    console.error("[chat/route]", status ?? "", errMessage);
+    if (status === 429) {
+      return new Response("Rate limit reached — please wait a moment and try again.", { status: 429 });
+    }
+    return new Response(errMessage || "AI request failed", { status: 502 });
+  }
 }
