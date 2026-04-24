@@ -20,6 +20,7 @@ export function Skills() {
 
     const W = container.clientWidth;
     const H = container.clientHeight;
+    if (W === 0 || H === 0) return;
     const R = 390;
 
     // ── Scene ──
@@ -294,6 +295,11 @@ export function Skills() {
           facing < -0.4 && !isH ? Math.min(2.2, (-facing - 0.4) * 3.5) : 0;
 
         const { el, labelEl } = pins[i];
+        el.style.left = `${sx}px`;
+        el.style.top = `${sy}px`;
+        el.style.opacity = opacity.toFixed(3);
+        el.style.zIndex = isH ? "999" : String(Math.round(depth * 800));
+        el.style.transform = `translate(-50%, -54%) scale(${scale.toFixed(3)})`;
 
         if (isH) {
           const c = GLOBE_TECHS[i].color;
