@@ -69,7 +69,9 @@ export function Skills() {
     );
 
     // Clean lat/lon wireframe — EdgesGeometry removes triangle diagonals
-    const wireGeo = new THREE.EdgesGeometry(new THREE.SphereGeometry(R, 22, 16));
+    const sphereForWire = new THREE.SphereGeometry(R, 22, 16);
+    const wireGeo = new THREE.EdgesGeometry(sphereForWire);
+    sphereForWire.dispose(); // EdgesGeometry has consumed it; free the source immediately
     globeGroup.add(
       new THREE.LineSegments(
         wireGeo,
@@ -128,9 +130,9 @@ export function Skills() {
         pointerEvents: "none",
       });
 
-      const label = document.createElement("span");
-      label.textContent = tech.name;
-      Object.assign(label.style, {
+      const labelEl = document.createElement("span");
+      labelEl.textContent = tech.name;
+      Object.assign(labelEl.style, {
         fontSize: "9px",
         fontWeight: "500",
         letterSpacing: "0.6px",
@@ -140,9 +142,9 @@ export function Skills() {
       });
 
       el.appendChild(img);
-      el.appendChild(label);
+      el.appendChild(labelEl);
       container.appendChild(el);
-      return el;
+      return { el, labelEl };
     });
 
     // ── Tooltip ──
@@ -206,7 +208,7 @@ export function Skills() {
     let pX = 0;
     let pY = 0;
 
-    pins.forEach((el, i) => {
+    pins.forEach(({ el }, i) => {
       el.addEventListener("mouseenter", () => { hovered = i; });
       el.addEventListener("mouseleave", () => {
         hovered = -1;
@@ -277,9 +279,9 @@ export function Skills() {
         const facing = iconUnits[i].clone().applyEuler(euler).z;
         const depth = (facing + 1) / 2;
 
-        const proj = tmp.clone().project(camera);
-        const sx = ((proj.x + 1) / 2) * cW;
-        const sy = ((-proj.y + 1) / 2) * cH;
+        tmp.project(camera);
+        const sx = ((tmp.x + 1) / 2) * cW;
+        const sy = ((-tmp.y + 1) / 2) * cH;
 
         const isH = i === hovered;
         const opacity = isH
@@ -291,14 +293,7 @@ export function Skills() {
         const blurPx =
           facing < -0.4 && !isH ? Math.min(2.2, (-facing - 0.4) * 3.5) : 0;
 
-        const el = pins[i];
-        el.style.left = `${sx}px`;
-        el.style.top = `${sy}px`;
-        el.style.opacity = opacity.toFixed(3);
-        el.style.zIndex = isH ? "999" : String(Math.round(depth * 800));
-        el.style.transform = `translate(-50%, -54%) scale(${scale.toFixed(3)})`;
-
-        const labelEl = el.querySelector<HTMLSpanElement>("span")!;
+        const { el, labelEl } = pins[i];
 
         if (isH) {
           const c = GLOBE_TECHS[i].color;
@@ -338,12 +333,23 @@ export function Skills() {
 
     return () => {
       cancelAnimationFrame(rafId);
-      canvas.removeEventListener("pointerdown", onPointerDown);
+      safeCanvas.removeEventListener("pointerdown", onPointerDown);
       window.removeEventListener("pointermove", onPointerMove);
       window.removeEventListener("pointerup", onPointerUp);
       ro.disconnect();
+
+      // Dispose all GPU resources in the scene graph
+      scene.traverse((obj) => {
+        const mesh = obj as THREE.Mesh;
+        if (mesh.geometry) mesh.geometry.dispose();
+        if (mesh.material) {
+          if (Array.isArray(mesh.material)) mesh.material.forEach((m) => m.dispose());
+          else mesh.material.dispose();
+        }
+      });
       renderer.dispose();
-      pins.forEach((p) => p.remove());
+
+      pins.forEach(({ el }) => el.remove());
       tooltipEl.remove();
     };
   }, []);
