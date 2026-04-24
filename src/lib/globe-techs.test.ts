@@ -7,11 +7,12 @@ describe("GLOBE_TECHS", () => {
   });
 
   it("each entry has required fields", () => {
+    const validCategories = ["Frontend", "Backend", "Databases", "DevOps", "Design", "Data & Viz", "Cloud"];
     for (const tech of GLOBE_TECHS) {
       expect(tech.name).toBeTruthy();
-      expect(tech.cat).toBeTruthy();
+      expect(validCategories).toContain(tech.cat);
       expect(["core", "comfortable"]).toContain(tech.tier);
-      expect(tech.icon).toMatch(/^https:\/\/cdn\.simpleicons\.org\//);
+      expect(tech.icon).toMatch(/^https:\/\/cdn\.simpleicons\.org\/.+\/.+$/);
       expect(tech.color).toMatch(/^#[0-9A-Fa-f]{6}$/);
     }
   });
