@@ -1,6 +1,6 @@
 export interface GlobeTech {
   name: string;
-  cat: string;
+  cat: "Frontend" | "Backend" | "Databases" | "DevOps" | "Design" | "Data & Viz" | "Cloud";
   tier: "core" | "comfortable";
   icon: string;
   color: string;
@@ -27,6 +27,8 @@ export const GLOBE_TECHS: GlobeTech[] = [
  * Pure function; no Three.js dependency so it's testable in a Node environment.
  */
 export function fibSphereUnit(n: number): [number, number, number][] {
+  if (n <= 0) return [];
+  if (n === 1) return [[0, 1, 0]];
   const pts: [number, number, number][] = [];
   const phi = Math.PI * (3 - Math.sqrt(5));
   for (let i = 0; i < n; i++) {
