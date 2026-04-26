@@ -11,7 +11,8 @@ function picsumUrl(name: string) {
 interface ProjectTileProps {
   project: {
     name: string;
-    tagline: string;
+    tagline?: string;
+    fullName?: string;
     tags: readonly string[];
     color?: string;
     href?: string;
@@ -164,7 +165,7 @@ export function ProjectTile({
             {project.name}
           </p>
           <p style={{ margin: "4px 0 8px", fontSize: 12, color: "rgba(255,255,255,0.65)" }}>
-            {project.tagline}
+            {project.tagline ?? project.fullName}
           </p>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
             {project.tags.slice(0, 3).map((tag) => (
