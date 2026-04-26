@@ -63,7 +63,7 @@ export function ProjectTile({
     >
       {/* Inner: hover lift + rotation + clip */}
       <motion.div
-        style={{ width: "100%", height: "100%", borderRadius: "16px", overflow: "hidden", position: "relative" }}
+        style={{ width: "100%", height: "100%", borderRadius: "16px", overflow: "hidden", position: "relative", background: "#1a1a20" }}
         animate={{
           rotate: canHover && hovered ? 0 : canHover ? rotation : 0,
           scale: hovered ? 1.03 : 1,
@@ -79,6 +79,9 @@ export function ProjectTile({
           animate={{ scale: hovered ? 1.06 : 1 }}
           transition={{ duration: 0.32, ease: "easeOut" }}
           style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+          onError={(e) => {
+            (e.currentTarget as HTMLImageElement).style.visibility = "hidden";
+          }}
         />
 
         {/* Top color line */}
@@ -147,7 +150,7 @@ export function ProjectTile({
 
         {/* Interactive content */}
         <motion.div
-          animate={{ opacity: hovered ? 1 : 0 }}
+          animate={{ opacity: canHover ? (hovered ? 1 : 0) : 1 }}
           transition={{ duration: 0.32 }}
           style={{
             position: "absolute",
