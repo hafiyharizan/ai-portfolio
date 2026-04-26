@@ -36,10 +36,12 @@ export function ProjectTile({
   gridRow,
 }: ProjectTileProps) {
   const [hovered, setHovered] = useState(false);
-  const [canHover, setCanHover] = useState(false);
+  const [canHover, setCanHover] = useState(true);
 
   useEffect(() => {
-    setCanHover(!window.matchMedia("(hover: none)").matches);
+    if (window.matchMedia("(hover: none)").matches) {
+      setCanHover(false);
+    }
   }, []);
 
   const lineColor =
@@ -132,7 +134,18 @@ export function ProjectTile({
           {type === "personal" ? "Personal" : "Professional"}
         </div>
 
-        {/* Hover overlay */}
+        {/* Non-interactive scrim gradient */}
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            background:
+              "linear-gradient(to top, rgba(0,0,0,0.88) 60%, transparent)",
+            pointerEvents: "none",
+          }}
+        />
+
+        {/* Interactive content */}
         <motion.div
           animate={{ opacity: hovered ? 1 : 0 }}
           transition={{ duration: 0.32 }}
@@ -142,19 +155,12 @@ export function ProjectTile({
             left: 0,
             right: 0,
             padding: "24px 16px 16px",
-            background:
-              "linear-gradient(to top, rgba(0,0,0,0.88) 60%, transparent)",
-            pointerEvents: "none",
           }}
         >
-          <p
-            style={{ margin: 0, fontWeight: 700, fontSize: 18, color: "#fff", lineHeight: 1.2 }}
-          >
+          <p style={{ margin: 0, fontWeight: 700, fontSize: 18, color: "#fff", lineHeight: 1.2 }}>
             {project.name}
           </p>
-          <p
-            style={{ margin: "4px 0 8px", fontSize: 12, color: "rgba(255,255,255,0.65)" }}
-          >
+          <p style={{ margin: "4px 0 8px", fontSize: 12, color: "rgba(255,255,255,0.65)" }}>
             {project.tagline}
           </p>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
@@ -174,7 +180,6 @@ export function ProjectTile({
             ))}
           </div>
 
-          {/* View arrow */}
           {project.href && (
             <motion.a
               href={project.href}
