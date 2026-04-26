@@ -404,3 +404,70 @@ body {
   0%, 100% { background-position: 0% 50%; }
   50%       { background-position: 100% 50%; }
 }
+
+/* ——— About bento grid ——— */
+.about-bento {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: 190px 190px 190px auto;
+}
+.about-bento .cell-photo      { grid-column: 1 / 3; grid-row: 1 / 4; }
+.about-bento .cell-summary    { grid-column: 3;     grid-row: 1;     }
+.about-bento .cell-xp         { grid-column: 3;     grid-row: 2;     }
+.about-bento .cell-clock      { grid-column: 3;     grid-row: 3;     }
+.about-bento .cell-edu        { grid-column: 1;     grid-row: 4;     }
+.about-bento .cell-interests  { grid-column: 2 / 4; grid-row: 4;     }
+
+@media (max-width: 1023px) {
+  .about-bento {
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: 200px 200px auto auto auto;
+  }
+  .about-bento .cell-photo      { grid-column: 1;     grid-row: 1 / 3; }
+  .about-bento .cell-summary    { grid-column: 2;     grid-row: 1;     }
+  .about-bento .cell-xp         { grid-column: 2;     grid-row: 2;     }
+  .about-bento .cell-clock      { grid-column: 1 / 3; grid-row: 3;     }
+  .about-bento .cell-edu        { grid-column: 1;     grid-row: 4;     }
+  .about-bento .cell-interests  { grid-column: 2;     grid-row: 4;     }
+}
+
+@media (max-width: 639px) {
+  .about-bento {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+    gap: 10px;
+  }
+  .about-bento .cell-photo,
+  .about-bento .cell-summary,
+  .about-bento .cell-xp,
+  .about-bento .cell-clock,
+  .about-bento .cell-edu,
+  .about-bento .cell-interests {
+    grid-column: 1;
+    grid-row: auto;
+  }
+  .about-bento .cell-photo { min-height: 320px; }
+}
+
+/* Shimmer text for education tile */
+.about-shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--foreground) 0%,
+    var(--accent-light) 38%,
+    var(--foreground) 52%,
+    var(--foreground) 100%
+  );
+  background-size: 280% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: about-shimmer-move 5s ease-in-out infinite;
+}
+
+@keyframes about-shimmer-move {
+  0%   { background-position: 120% 0; }
+  50%  { background-position: -80% 0; }
+  100% { background-position: 120% 0; }
+}
