@@ -380,3 +380,27 @@ body {
   box-shadow: var(--popover-shadow);
   cursor: pointer;
 }
+
+/* ——— Projects scroll grid ——— */
+.project-layer {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-row: 1 / -1;
+  grid-template-columns: subgrid;
+  grid-template-rows: subgrid;
+}
+
+@supports not (grid-template-columns: subgrid) {
+  .project-layer {
+    position: absolute;
+    inset: 0;
+    grid-template-columns: 1fr 1.6fr 1fr;
+    grid-template-rows: 1fr 1.6fr 1fr;
+    gap: clamp(14px, 1.8vw, 28px);
+  }
+}
+
+@keyframes gradient-drift {
+  0%, 100% { background-position: 0% 50%; }
+  50%       { background-position: 100% 50%; }
+}
