@@ -211,3 +211,81 @@ export function ProjectTile({
     </motion.div>
   );
 }
+
+interface HeroTileProps {
+  motionScale: MotionValue<number>;
+  motionBorderRadius: MotionValue<number>;
+  heroCellRef: RefObject<HTMLDivElement | null>;
+}
+
+export function HeroTile({ motionScale, motionBorderRadius, heroCellRef }: HeroTileProps) {
+  const [hovered, setHovered] = useState(false);
+
+  return (
+    <motion.div
+      ref={heroCellRef}
+      style={{
+        scale: motionScale,
+        borderRadius: motionBorderRadius,
+        gridColumn: "2",
+        gridRow: "2",
+        aspectRatio: "3 / 4",
+        overflow: "hidden",
+        position: "relative",
+        zIndex: 1,
+      }}
+      onHoverStart={() => setHovered(true)}
+      onHoverEnd={() => setHovered(false)}
+    >
+      {/* Placeholder image */}
+      <img
+        src="https://picsum.photos/seed/portfolio-hero/600/800"
+        alt=""
+        style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+      />
+
+      {/* Ambient gradient drift */}
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          background:
+            "linear-gradient(135deg, var(--accent), transparent 50%, var(--accent-hot))",
+          backgroundSize: "200% 200%",
+          animation: "gradient-drift 7s ease-in-out infinite",
+          opacity: 0.06,
+          pointerEvents: "none",
+        }}
+      />
+
+      {/* Subtle shimmer */}
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          background: "rgba(255,255,255,0.02)",
+          pointerEvents: "none",
+        }}
+      />
+
+      {/* Hover CTA */}
+      <motion.div
+        animate={{ opacity: hovered ? 1 : 0 }}
+        transition={{ duration: 0.3 }}
+        style={{
+          position: "absolute",
+          inset: 0,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          background: "rgba(0,0,0,0.35)",
+          pointerEvents: "none",
+        }}
+      >
+        <p style={{ color: "#fff", fontSize: 14, fontWeight: 600, margin: 0 }}>
+          Explore my work ↓
+        </p>
+      </motion.div>
+    </motion.div>
+  );
+}
