@@ -1,273 +1,370 @@
 "use client";
 
-import { useRef } from "react";
-import { motion, useInView } from "framer-motion";
-import {
-  TreePine,
-  Sparkles,
-  LayoutDashboard,
-  Fish,
-  Database,
-  Server,
-  Map,
-  ShieldCheck,
-  ArrowUpRight,
-  type LucideIcon,
-} from "lucide-react";
+import { useState, type CSSProperties, type MouseEvent } from "react";
+import { motion } from "framer-motion";
+import { ExternalLink, GitBranch, Activity } from "lucide-react";
 
 import { SectionHeading } from "@/components/ui/section-heading";
-import { Badge } from "@/components/ui/badge";
-import { PERSONAL_PROJECTS, PROFESSIONAL_PROJECTS } from "@/lib/constants";
+import {
+  PERSONAL_PROJECTS,
+  PROFESSIONAL_PROJECTS,
+  SITE_CONFIG,
+} from "@/lib/constants";
 import { EASE_OUT_QUART } from "@/lib/motion";
 
-// ---------------------------------------------------------------------------
-// Icon mapping
-// ---------------------------------------------------------------------------
-const ICON_MAP: Record<string, LucideIcon> = {
-  tree: TreePine,
-  sparkles: Sparkles,
-  "layout-dashboard": LayoutDashboard,
-  fish: Fish,
-  database: Database,
-  server: Server,
-  map: Map,
-  "shield-check": ShieldCheck,
-};
+// ── Mouse-tracking glow ───────────────────────────────────────────────────────
 
-// ---------------------------------------------------------------------------
-// Animation variants
-// ---------------------------------------------------------------------------
-const containerVariants = {
-  hidden: {},
-  visible: {
-    transition: { staggerChildren: 0.1 },
-  },
-};
-
-const cardVariants = {
-  hidden: { opacity: 0, y: 32 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.5, ease: EASE_OUT_QUART },
-  },
-};
-
-// ---------------------------------------------------------------------------
-// Mouse-tracking glow helper
-// ---------------------------------------------------------------------------
-function handleMouseMove(e: React.MouseEvent<HTMLElement>) {
-  const rect = e.currentTarget.getBoundingClientRect();
-  e.currentTarget.style.setProperty(
-    "--mouse-x",
-    `${e.clientX - rect.left}px`,
-  );
-  e.currentTarget.style.setProperty(
-    "--mouse-y",
-    `${e.clientY - rect.top}px`,
-  );
+function trackMouse(e: MouseEvent<HTMLElement>) {
+  const r = e.currentTarget.getBoundingClientRect();
+  e.currentTarget.style.setProperty("--mx", `${e.clientX - r.left}px`);
+  e.currentTarget.style.setProperty("--my", `${e.clientY - r.top}px`);
 }
 
-// ---------------------------------------------------------------------------
-// Personal Project Card
-// ---------------------------------------------------------------------------
-function PersonalProjectCard({
-  project,
+// ── Section label ─────────────────────────────────────────────────────────────
+
+function SectionLabel({
+  children,
+  live = false,
 }: {
-  project: (typeof PERSONAL_PROJECTS)[number];
+  children: React.ReactNode;
+  live?: boolean;
 }) {
-  const Icon = ICON_MAP[project.icon] ?? Sparkles;
-
-  return (
-    <motion.a
-      href={project.href}
-      target="_blank"
-      rel="noopener noreferrer"
-      variants={cardVariants}
-      onMouseMove={handleMouseMove}
-      className="glow-card group relative flex flex-col rounded-2xl border border-border bg-card p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-black/20"
-      style={
-        {
-          "--hover-border": project.color,
-        } as React.CSSProperties
-      }
-      whileHover={{
-        borderColor: project.color,
-      }}
-    >
-      {/* Top row: icon + external link */}
-      <div className="relative z-10 flex items-start justify-between">
-        <div
-          className="flex h-11 w-11 items-center justify-center rounded-xl"
-          style={{ backgroundColor: `${project.color}18` }}
-        >
-          <Icon
-            className="h-5 w-5"
-            style={{ color: project.color }}
-            strokeWidth={1.8}
-          />
-        </div>
-
-        <ArrowUpRight
-          className="h-4 w-4 text-muted-foreground opacity-0 transition-all duration-300 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-          style={{ color: project.color }}
-          strokeWidth={2}
-        />
-      </div>
-
-      {/* Name + tagline */}
-      <div className="relative z-10 mt-5">
-        <h3 className="text-lg font-semibold text-foreground transition-colors duration-300 group-hover:text-white">
-          {project.name}
-        </h3>
-        <p className="mt-1 text-sm text-muted-foreground">{project.tagline}</p>
-      </div>
-
-      {/* Description */}
-      <p className="relative z-10 mt-3 flex-1 text-sm leading-relaxed text-muted">
-        {project.description}
-      </p>
-
-      {/* Tags */}
-      <div className="relative z-10 mt-5 flex flex-wrap gap-2">
-        {project.tags.map((tag) => (
-          <Badge key={tag}>{tag}</Badge>
-        ))}
-      </div>
-    </motion.a>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Professional Project Card
-// ---------------------------------------------------------------------------
-function ProfessionalProjectCard({
-  project,
-}: {
-  project: (typeof PROFESSIONAL_PROJECTS)[number];
-}) {
-  const Icon = ICON_MAP[project.icon] ?? Database;
-
   return (
     <motion.div
-      variants={cardVariants}
-      onMouseMove={handleMouseMove}
-      className="glow-card group relative flex flex-col gap-5 rounded-2xl border border-border bg-card p-6 transition-all duration-300 hover:-translate-y-0.5 hover:border-accent/40 md:flex-row md:items-start md:gap-6"
+      initial={{ opacity: 0, x: -14 }}
+      whileInView={{ opacity: 1, x: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.4, ease: EASE_OUT_QUART }}
+      className="mb-6 flex items-center gap-3"
     >
-      {/* Left column: icon + acronym */}
-      <div className="relative z-10 flex shrink-0 items-center gap-4 md:flex-col md:items-center md:gap-3 md:pt-1">
-        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-accent/10">
-          <Icon className="h-5 w-5 text-accent-light" strokeWidth={1.8} />
-        </div>
-        <span className="gradient-text text-2xl font-bold tracking-tight md:text-xl">
-          {project.name}
-        </span>
-      </div>
-
-      {/* Right column: content */}
-      <div className="relative z-10 flex flex-1 flex-col">
-        <p className="text-sm font-medium text-muted-foreground">
-          {project.fullName}
-        </p>
-        <p className="mt-2 text-sm leading-relaxed text-muted">
-          {project.description}
-        </p>
-
-        {/* Impact */}
-        <p className="mt-3 text-sm">
-          <span className="font-semibold text-accent-light">Impact: </span>
-          <span className="font-medium text-foreground">{project.impact}</span>
-        </p>
-
-        {/* Tags */}
-        <div className="mt-4 flex flex-wrap gap-2">
-          {project.tags.map((tag) => (
-            <Badge key={tag}>{tag}</Badge>
-          ))}
-        </div>
-      </div>
+      {live && (
+        <span
+          className="inline-block h-2 w-2 animate-pulse rounded-full"
+          style={{ background: "var(--accent)" }}
+        />
+      )}
+      <span className="font-mono text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+        {children}
+      </span>
+      <div
+        className="h-px flex-1"
+        style={{
+          background:
+            "linear-gradient(90deg, rgba(255,255,255,0.07), transparent)",
+        }}
+      />
     </motion.div>
   );
 }
 
-// ---------------------------------------------------------------------------
-// Subsection title
-// ---------------------------------------------------------------------------
-function SubsectionTitle({ children }: { children: React.ReactNode }) {
+// ── Tag pill ──────────────────────────────────────────────────────────────────
+
+function Tag({ children, mono = false }: { children: string; mono?: boolean }) {
   return (
-    <motion.h3
-      initial={{ opacity: 0, x: -12 }}
-      whileInView={{ opacity: 1, x: 0 }}
-      viewport={{ once: true, margin: "-80px" }}
-      transition={{ duration: 0.4 }}
-      className="mb-8 text-sm font-semibold uppercase tracking-widest text-muted-foreground"
+    <span
+      className={`rounded border px-2 py-0.5 text-[11px] text-muted-foreground ${mono ? "font-mono" : "font-medium"}`}
+      style={{
+        borderColor: "rgba(255,255,255,0.06)",
+        background: "rgba(255,255,255,0.025)",
+      }}
     >
       {children}
-    </motion.h3>
+    </span>
   );
 }
 
-// ---------------------------------------------------------------------------
-// Projects Section
-// ---------------------------------------------------------------------------
+// ── Personal project card ─────────────────────────────────────────────────────
+
+type Personal = (typeof PERSONAL_PROJECTS)[number];
+
+function PersonalCard({
+  project,
+  delay = 0,
+}: {
+  project: Personal;
+  delay?: number;
+}) {
+  const [hovered, setHovered] = useState(false);
+
+  return (
+    <motion.article
+      initial={{ opacity: 0, y: 28 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-60px" }}
+      transition={{ duration: 0.55, delay, ease: EASE_OUT_QUART }}
+      onMouseMove={trackMouse}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      className="group relative flex h-full flex-col overflow-hidden rounded-2xl border p-6 transition-[border-color,box-shadow] duration-300"
+      style={
+        {
+          borderColor: hovered
+            ? `color-mix(in srgb, ${project.color} 32%, transparent)`
+            : "rgba(255,255,255,0.06)",
+          background:
+            "linear-gradient(150deg, rgba(14,14,19,0.97), rgba(9,9,13,0.99))",
+          backdropFilter: "blur(12px)",
+          boxShadow: hovered
+            ? `0 24px 64px -24px ${project.color}2e, inset 0 0 0 1px ${project.color}12`
+            : "none",
+        } as CSSProperties
+      }
+    >
+      {/* Radial mouse glow */}
+      <div
+        className="pointer-events-none absolute inset-0 rounded-2xl opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+        style={{
+          background: `radial-gradient(520px circle at var(--mx, 50%) var(--my, 50%), ${project.color}0b, transparent 42%)`,
+        }}
+      />
+
+      {/* Left accent bar */}
+      <div
+        className="pointer-events-none absolute inset-y-5 left-0 w-[3px] rounded-r-full transition-all duration-300"
+        style={{
+          background: `linear-gradient(to bottom, ${project.color}e0, ${project.color}1a)`,
+          opacity: hovered ? 1 : 0.28,
+          transform: hovered ? "scaleY(1)" : "scaleY(0.75)",
+          transformOrigin: "top",
+        }}
+      />
+
+      {/* Featured badge */}
+      {project.featured && (
+        <div
+          className="absolute right-5 top-5 z-10 flex items-center gap-1.5 rounded-full border px-2.5 py-[5px] text-[10px] font-semibold uppercase tracking-[0.15em]"
+          style={{
+            borderColor: `${project.color}38`,
+            background: `${project.color}0e`,
+            color: project.color,
+          }}
+        >
+          <span
+            className="inline-block h-1.5 w-1.5 animate-pulse rounded-full"
+            style={{ background: project.color }}
+          />
+          Featured
+        </div>
+      )}
+
+      {/* Header: icon + name + tagline */}
+      <div className="relative z-10 flex items-start gap-3 pr-28">
+        <div
+          className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-[13px] font-bold transition-colors duration-300"
+          style={{
+            background: `${project.color}13`,
+            color: project.color,
+            border: `1px solid ${project.color}22`,
+          }}
+        >
+          {project.name[0]}
+        </div>
+        <div>
+          <h3 className="text-[15px] font-bold leading-tight text-foreground transition-colors duration-200 group-hover:text-white">
+            {project.name}
+          </h3>
+          <p className="mt-0.5 text-[11px] leading-tight text-muted-foreground">
+            {project.tagline}
+          </p>
+        </div>
+      </div>
+
+      {/* Description */}
+      <p className="relative z-10 mt-5 flex-1 text-sm leading-relaxed text-muted">
+        {project.description}
+      </p>
+
+      {/* Tags */}
+      <div className="relative z-10 mt-5 flex flex-wrap gap-1.5">
+        {project.tags.slice(0, 5).map((t) => (
+          <Tag key={t}>{t}</Tag>
+        ))}
+        {project.tags.length > 5 && (
+          <span className="px-1 py-0.5 text-[11px] text-muted-foreground">
+            +{project.tags.length - 5}
+          </span>
+        )}
+      </div>
+
+      {/* CTAs */}
+      <div className="relative z-10 mt-5 grid grid-cols-2 gap-2">
+        <a
+          href={SITE_CONFIG.github}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={`View ${project.name} source code`}
+          className="inline-flex h-9 items-center justify-center gap-1.5 rounded-xl border text-[12px] font-semibold text-muted-foreground transition-all duration-200 hover:border-white/10 hover:text-foreground"
+          style={{
+            borderColor: "rgba(255,255,255,0.07)",
+            background: "rgba(255,255,255,0.02)",
+          }}
+        >
+          <GitBranch className="h-3.5 w-3.5" strokeWidth={2} />
+          Code
+        </a>
+        <a
+          href={project.href}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={`Open ${project.name} live demo`}
+          className="inline-flex h-9 items-center justify-center gap-1.5 rounded-xl text-[12px] font-semibold text-white transition-all duration-200 hover:brightness-110 active:brightness-90"
+          style={{
+            background: `linear-gradient(135deg, ${project.color}cc, ${project.color}88)`,
+            boxShadow: hovered ? `0 8px 28px -8px ${project.color}66` : "none",
+            transition: "box-shadow 300ms, filter 200ms",
+          }}
+        >
+          <ExternalLink className="h-3.5 w-3.5" strokeWidth={2} />
+          Demo
+        </a>
+      </div>
+    </motion.article>
+  );
+}
+
+// ── Professional project card ─────────────────────────────────────────────────
+
+type Professional = (typeof PROFESSIONAL_PROJECTS)[number];
+
+function ProfessionalCard({
+  project,
+  index,
+}: {
+  project: Professional;
+  index: number;
+}) {
+  const [hovered, setHovered] = useState(false);
+
+  return (
+    <motion.article
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-40px" }}
+      transition={{ duration: 0.5, delay: index * 0.07, ease: EASE_OUT_QUART }}
+      onMouseMove={trackMouse}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      className="group relative flex flex-col overflow-hidden rounded-2xl border p-6 transition-[border-color,box-shadow] duration-300"
+      style={{
+        borderColor: hovered
+          ? "rgba(255,255,255,0.09)"
+          : "rgba(255,255,255,0.05)",
+        background:
+          "linear-gradient(150deg, rgba(11,11,15,0.97), rgba(7,7,11,0.99))",
+        boxShadow: hovered ? "0 20px 56px -22px rgba(0,0,0,0.6)" : "none",
+      }}
+    >
+      {/* Neutral radial glow */}
+      <div
+        className="pointer-events-none absolute inset-0 rounded-2xl opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+        style={{
+          background: `radial-gradient(380px circle at var(--mx, 50%) var(--my, 50%), rgba(255,255,255,0.022), transparent 42%)`,
+        }}
+      />
+
+      {/* Top accent gradient line */}
+      <div
+        className="pointer-events-none absolute inset-x-0 top-0 h-px transition-opacity duration-300"
+        style={{
+          background:
+            "linear-gradient(90deg, transparent, var(--accent-line), transparent)",
+          opacity: hovered ? 1 : 0.45,
+        }}
+      />
+
+      {/* Codename */}
+      <div className="relative z-10">
+        <span className="font-mono text-[10px] font-bold uppercase tracking-[0.24em] text-muted-foreground opacity-60">
+          {project.name}
+        </span>
+        <h3 className="mt-1.5 text-sm font-bold leading-snug text-foreground transition-colors duration-200 group-hover:text-white">
+          {project.fullName}
+        </h3>
+      </div>
+
+      {/* Impact metric badge */}
+      <div
+        className="relative z-10 mt-4 inline-flex w-fit items-center gap-1.5 rounded-lg px-2.5 py-1.5"
+        style={{
+          background: "var(--accent-soft)",
+          border: "1px solid var(--accent-line)",
+        }}
+      >
+        <Activity className="h-3 w-3 text-accent-light" strokeWidth={2.5} />
+        <span className="text-[11px] font-bold text-accent-light">
+          {project.impact}
+        </span>
+      </div>
+
+      {/* Description */}
+      <p className="relative z-10 mt-4 flex-1 text-xs leading-relaxed text-muted">
+        {project.description}
+      </p>
+
+      {/* Tags — monospace style */}
+      <div className="relative z-10 mt-4 flex flex-wrap gap-1.5">
+        {project.tags.slice(0, 3).map((t) => (
+          <Tag key={t} mono>
+            {t}
+          </Tag>
+        ))}
+        {project.tags.length > 3 && (
+          <span className="px-1 py-0.5 font-mono text-[10px] text-muted-foreground">
+            +{project.tags.length - 3}
+          </span>
+        )}
+      </div>
+    </motion.article>
+  );
+}
+
+// ── Root export ───────────────────────────────────────────────────────────────
+
 export function Projects() {
-  const personalRef = useRef<HTMLDivElement>(null);
-  const professionalRef = useRef<HTMLDivElement>(null);
-
-  const personalInView = useInView(personalRef, {
-    once: true,
-    margin: "-80px",
-  });
-  const professionalInView = useInView(professionalRef, {
-    once: true,
-    margin: "-80px",
-  });
-
   return (
     <section id="projects" className="relative py-24 sm:py-32">
       <div className="mx-auto max-w-6xl px-6">
         <SectionHeading
           label="Projects"
           title="Things I've built"
-          subtitle="From production data platforms to personal passion projects."
+          subtitle="Data platforms powering millions of records. Consumer apps shipped and used."
         />
 
-        {/* ---------------------------------------------------------------- */}
-        {/* Personal Projects                                                */}
-        {/* ---------------------------------------------------------------- */}
+        {/* ── Personal Apps: Asymmetric Bento ──────────────────────── */}
         <div className="mt-4">
-          <SubsectionTitle>Personal Projects</SubsectionTitle>
+          <SectionLabel>Personal Apps</SectionLabel>
 
-          <motion.div
-            ref={personalRef}
-            variants={containerVariants}
-            initial="hidden"
-            animate={personalInView ? "visible" : "hidden"}
-            className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
-          >
-            {PERSONAL_PROJECTS.map((project) => (
-              <PersonalProjectCard key={project.name} project={project} />
-            ))}
-          </motion.div>
+          {/*
+            5-col bento grid (zigzag):
+              Row 1 — Salasilah (3/5)  | ChoreQuest  (2/5)
+              Row 2 — FridgeBoard(2/5) | FishScout   (3/5)
+            Mobile: single column stack.
+          */}
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-5">
+            <div className="sm:col-span-3">
+              <PersonalCard project={PERSONAL_PROJECTS[0]} delay={0} />
+            </div>
+            <div className="sm:col-span-2">
+              <PersonalCard project={PERSONAL_PROJECTS[1]} delay={0.08} />
+            </div>
+            <div className="sm:col-span-2">
+              <PersonalCard project={PERSONAL_PROJECTS[2]} delay={0.16} />
+            </div>
+            <div className="sm:col-span-3">
+              <PersonalCard project={PERSONAL_PROJECTS[3]} delay={0.24} />
+            </div>
+          </div>
         </div>
 
-        {/* ---------------------------------------------------------------- */}
-        {/* Production Projects                                              */}
-        {/* ---------------------------------------------------------------- */}
-        <div className="mt-24">
-          <SubsectionTitle>Production Projects</SubsectionTitle>
+        {/* ── Production Systems: Mission Control ──────────────────── */}
+        <div className="mt-20">
+          <SectionLabel live>Production Systems</SectionLabel>
 
-          <motion.div
-            ref={professionalRef}
-            variants={containerVariants}
-            initial="hidden"
-            animate={professionalInView ? "visible" : "hidden"}
-            className="grid gap-6 md:grid-cols-2"
-          >
-            {PROFESSIONAL_PROJECTS.map((project) => (
-              <ProfessionalProjectCard key={project.name} project={project} />
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {PROFESSIONAL_PROJECTS.map((project, i) => (
+              <ProfessionalCard key={project.name} project={project} index={i} />
             ))}
-          </motion.div>
+          </div>
         </div>
       </div>
     </section>

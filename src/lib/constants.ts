@@ -30,6 +30,7 @@ export const PERSONAL_PROJECTS = [
     icon: "tree",
     color: "#10b981",
     href: "https://salasilah.my/",
+    featured: true,
   },
   {
     name: "ChoreQuest",
@@ -40,6 +41,7 @@ export const PERSONAL_PROJECTS = [
     icon: "sparkles",
     color: "#f59e0b",
     href: "https://chorequest-nu.vercel.app/",
+    featured: true,
   },
   {
     name: "FridgeBoard",
@@ -50,6 +52,7 @@ export const PERSONAL_PROJECTS = [
     icon: "layout-dashboard",
     color: "#3b82f6",
     href: "https://fridgeboard.netlify.app/",
+    featured: false,
   },
   {
     name: "FishScout",
@@ -60,6 +63,7 @@ export const PERSONAL_PROJECTS = [
     icon: "fish",
     color: "#06b6d4",
     href: "https://fishos-seven.vercel.app/",
+    featured: false,
   },
 ] as const;
 
