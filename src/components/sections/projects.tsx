@@ -49,8 +49,7 @@ function SectionLabel({
       <div
         className="h-px flex-1"
         style={{
-          background:
-            "linear-gradient(90deg, rgba(255,255,255,0.07), transparent)",
+          background: "var(--neutral-line-gradient)",
         }}
       />
     </motion.div>
@@ -64,8 +63,8 @@ function Tag({ children, mono = false }: { children: string; mono?: boolean }) {
     <span
       className={`rounded border px-2 py-0.5 text-[11px] text-muted-foreground ${mono ? "font-mono" : "font-medium"}`}
       style={{
-        borderColor: "rgba(255,255,255,0.06)",
-        background: "rgba(255,255,255,0.025)",
+        borderColor: "var(--subtle-border)",
+        background: "var(--subtle-fill)",
       }}
     >
       {children}
@@ -100,9 +99,8 @@ function PersonalCard({
         {
           borderColor: hovered
             ? `color-mix(in srgb, ${project.color} 32%, transparent)`
-            : "rgba(255,255,255,0.06)",
-          background:
-            "linear-gradient(150deg, rgba(14,14,19,0.97), rgba(9,9,13,0.99))",
+            : "var(--subtle-border)",
+          background: "var(--card-surface-gradient)",
           backdropFilter: "blur(12px)",
           boxShadow: hovered
             ? `0 24px 64px -24px ${project.color}2e, inset 0 0 0 1px ${project.color}12`
@@ -160,7 +158,7 @@ function PersonalCard({
           {project.name[0]}
         </div>
         <div>
-          <h3 className="text-[15px] font-bold leading-tight text-foreground transition-colors duration-200 group-hover:text-white">
+          <h3 className="text-[15px] font-bold leading-tight text-foreground transition-colors duration-200 group-hover:text-accent-light">
             {project.name}
           </h3>
           <p className="mt-0.5 text-[11px] leading-tight text-muted-foreground">
@@ -195,8 +193,8 @@ function PersonalCard({
           aria-label={`View ${project.name} source code`}
           className="inline-flex h-9 items-center justify-center gap-1.5 rounded-xl border text-[12px] font-semibold text-muted-foreground transition-all duration-200 hover:border-white/10 hover:text-foreground"
           style={{
-            borderColor: "rgba(255,255,255,0.07)",
-            background: "rgba(255,255,255,0.02)",
+            borderColor: "var(--subtle-border)",
+            background: "var(--subtle-fill)",
           }}
         >
           <GitBranch className="h-3.5 w-3.5" strokeWidth={2} />
@@ -247,18 +245,17 @@ function ProfessionalCard({
       className="group relative flex flex-col overflow-hidden rounded-2xl border p-6 transition-[border-color,box-shadow] duration-300"
       style={{
         borderColor: hovered
-          ? "rgba(255,255,255,0.09)"
-          : "rgba(255,255,255,0.05)",
-        background:
-          "linear-gradient(150deg, rgba(11,11,15,0.97), rgba(7,7,11,0.99))",
-        boxShadow: hovered ? "0 20px 56px -22px rgba(0,0,0,0.6)" : "none",
+          ? "var(--subtle-border-strong)"
+          : "var(--subtle-border)",
+        background: "var(--card-surface-gradient-alt)",
+        boxShadow: hovered ? "var(--card-hover-shadow)" : "none",
       }}
     >
       {/* Neutral radial glow */}
       <div
         className="pointer-events-none absolute inset-0 rounded-2xl opacity-0 transition-opacity duration-300 group-hover:opacity-100"
         style={{
-          background: `radial-gradient(380px circle at var(--mx, 50%) var(--my, 50%), rgba(255,255,255,0.022), transparent 42%)`,
+          background: "radial-gradient(380px circle at var(--mx, 50%) var(--my, 50%), var(--neutral-glow), transparent 42%)",
         }}
       />
 
@@ -277,7 +274,7 @@ function ProfessionalCard({
         <span className="font-mono text-[10px] font-bold uppercase tracking-[0.24em] text-muted-foreground opacity-60">
           {project.name}
         </span>
-        <h3 className="mt-1.5 text-sm font-bold leading-snug text-foreground transition-colors duration-200 group-hover:text-white">
+        <h3 className="mt-1.5 text-sm font-bold leading-snug text-foreground transition-colors duration-200 group-hover:text-accent-light">
           {project.fullName}
         </h3>
       </div>

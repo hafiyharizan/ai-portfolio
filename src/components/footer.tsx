@@ -15,9 +15,13 @@ export function Footer() {
   const [clock, setClock] = useState("--:--");
 
   useEffect(() => {
-    setClock(perthTime());
-    const id = setInterval(() => setClock(perthTime()), 30_000);
-    return () => clearInterval(id);
+    const updateClock = () => setClock(perthTime());
+    const timeout = window.setTimeout(updateClock, 0);
+    const id = window.setInterval(updateClock, 30_000);
+    return () => {
+      window.clearTimeout(timeout);
+      window.clearInterval(id);
+    };
   }, []);
 
   return (
@@ -30,7 +34,7 @@ export function Footer() {
         letterSpacing: "0.12em",
         textTransform: "uppercase",
         borderTop: "1px solid var(--line)",
-        background: "linear-gradient(to top, rgba(7,7,9,0.85), transparent)",
+        background: "var(--footer-fade)",
         backdropFilter: "blur(6px)",
       }}
       role="contentinfo"

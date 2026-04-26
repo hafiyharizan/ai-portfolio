@@ -138,7 +138,7 @@ export function AskAIModal({ isOpen, onClose }: Props) {
       <div
         className="fixed inset-0 z-[50] transition-opacity duration-300"
         style={{
-          background: "rgba(5,5,7,0.65)",
+          background: "var(--modal-scrim)",
           backdropFilter: "blur(8px)",
           opacity: isOpen ? 1 : 0,
           pointerEvents: isOpen ? "auto" : "none",
@@ -156,9 +156,9 @@ export function AskAIModal({ isOpen, onClose }: Props) {
                 left: 12, right: 12, bottom: 12,
                 width: "auto",
                 height: "80vh",
-                background: "linear-gradient(180deg, #111116 0%, #0a0a0e 100%)",
+                background: "var(--modal-surface)",
                 border: "1px solid var(--line-strong)",
-                boxShadow: "0 -20px 80px -10px rgba(0,0,0,0.8), 0 0 60px -10px var(--accent-soft)",
+                boxShadow: "var(--modal-shadow-mobile)",
                 transform: isOpen ? "translateY(0)" : "translateY(110%)",
                 transition: "transform 0.45s cubic-bezier(0.22, 1, 0.36, 1)",
               }
@@ -167,9 +167,9 @@ export function AskAIModal({ isOpen, onClose }: Props) {
                 right: 40,
                 width: "min(440px, calc(100vw - 32px))",
                 height: "min(680px, calc(100vh - 48px))",
-                background: "linear-gradient(180deg, #111116 0%, #0a0a0e 100%)",
+                background: "var(--modal-surface)",
                 border: "1px solid var(--line-strong)",
-                boxShadow: "0 40px 120px -20px rgba(0,0,0,0.8), 0 0 60px -10px var(--accent-soft)",
+                boxShadow: "var(--modal-shadow-desktop)",
                 transform: isOpen ? "translate(0, -50%)" : "translate(120%, -50%)",
                 transition: "transform 0.45s cubic-bezier(0.22, 1, 0.36, 1)",
               }
@@ -190,7 +190,7 @@ export function AskAIModal({ isOpen, onClose }: Props) {
             <Image src="/avatar.png" alt="" fill className="object-cover object-top" />
             <span
               className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full"
-              style={{ background: "var(--ok)", border: "2px solid #0e0e12" }}
+              style={{ background: "var(--ok)", border: "2px solid var(--avatar-status-ring)" }}
             />
           </div>
           <div className="flex-1">

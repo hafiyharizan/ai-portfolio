@@ -55,9 +55,13 @@ export function Hero() {
   const { isMedium, isSmall } = useBreakpoint();
 
   useEffect(() => {
-    setClock(perthTime());
-    const id = setInterval(() => setClock(perthTime()), 30_000);
-    return () => clearInterval(id);
+    const updateClock = () => setClock(perthTime());
+    const timeout = window.setTimeout(updateClock, 0);
+    const id = window.setInterval(updateClock, 30_000);
+    return () => {
+      window.clearTimeout(timeout);
+      window.clearInterval(id);
+    };
   }, []);
 
   useEffect(() => {
@@ -226,7 +230,7 @@ export function Hero() {
                 background: "var(--foreground)",
                 color: "var(--background)",
                 letterSpacing: "-0.005em",
-                boxShadow: "0 0 0 1px rgba(255,255,255,0.15), 0 8px 24px -8px rgba(255,255,255,0.2)",
+                boxShadow: "var(--primary-action-shadow)",
               }}
             >
               View projects
@@ -287,7 +291,7 @@ export function Hero() {
                 className="shrink-0 uppercase"
                 style={{ fontFamily: "var(--font-jb-mono)", fontSize: 11, color: "var(--muted-foreground)", letterSpacing: "0.08em" }}
               >
-                // stack
+                {"// stack"}
               </span>
               <div
                 className="flex flex-1 items-center gap-2.5 overflow-hidden"
@@ -344,7 +348,7 @@ export function Hero() {
                 style={{
                   border: "1px solid var(--line-strong)",
                   background: "var(--card)",
-                  boxShadow: "0 40px 100px -25px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.02) inset, 0 0 60px -10px var(--accent-soft)",
+                  boxShadow: "var(--portrait-shadow)",
                 }}
               >
                 <Image
@@ -357,7 +361,7 @@ export function Hero() {
                 />
                 <div
                   className="pointer-events-none absolute inset-0"
-                  style={{ background: "linear-gradient(180deg, transparent 55%, rgba(7,7,9,0.85))" }}
+                  style={{ background: "var(--portrait-overlay)" }}
                 />
 
                 {/* Top label bar */}
@@ -367,7 +371,7 @@ export function Hero() {
                 >
                   <span
                     className="inline-flex items-center gap-1.5 rounded-full px-2 py-1"
-                    style={{ background: "rgba(10,10,14,0.6)", backdropFilter: "blur(10px)", border: "1px solid rgba(255,255,255,0.08)" }}
+                    style={{ background: "var(--glass-bg)", backdropFilter: "blur(10px)", border: "1px solid var(--glass-border)" }}
                   >
                     <span
                       className="h-1.5 w-1.5 rounded-full"
@@ -377,7 +381,7 @@ export function Hero() {
                   </span>
                   <span
                     className="rounded-full px-2 py-1"
-                    style={{ background: "rgba(10,10,14,0.6)", backdropFilter: "blur(10px)", border: "1px solid rgba(255,255,255,0.08)", color: "var(--muted)" }}
+                    style={{ background: "var(--glass-bg)", backdropFilter: "blur(10px)", border: "1px solid var(--glass-border)", color: "var(--muted)" }}
                   >
                     ID_0401
                   </span>
@@ -390,9 +394,9 @@ export function Hero() {
                     gridTemplateColumns: "1fr auto 1fr",
                     fontFamily: "var(--font-jb-mono)",
                     fontSize: 10,
-                    background: "rgba(10,10,14,0.7)",
+                    background: "var(--glass-bg-strong)",
                     backdropFilter: "blur(12px)",
-                    border: "1px solid rgba(255,255,255,0.08)",
+                    border: "1px solid var(--glass-border)",
                   }}
                 >
                   <div className="flex flex-col gap-0.5">
@@ -438,10 +442,10 @@ export function Hero() {
                       fontFamily: "var(--font-jb-mono)",
                       fontSize: 11,
                       color: "var(--foreground)",
-                      background: "rgba(17,17,22,0.85)",
+                      background: "var(--module-bg)",
                       backdropFilter: "blur(12px)",
                       border: "1px solid var(--line-strong)",
-                      boxShadow: "0 20px 40px -10px rgba(0,0,0,0.6)",
+                      boxShadow: "var(--module-shadow)",
                       animation: `float 7s ease-in-out ${m.delay} infinite`,
                       transform: "translateZ(50px)",
                     }}

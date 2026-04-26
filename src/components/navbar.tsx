@@ -30,7 +30,7 @@ export function Navbar() {
       className="relative z-10 border-b"
       style={{
         borderColor: "var(--line)",
-        background: "rgba(7,7,9,0.5)",
+        background: "var(--nav-bg)",
         backdropFilter: "blur(10px)",
       }}
     >
@@ -123,10 +123,10 @@ export function Navbar() {
                 top: "100%",
                 width: 220,
                 zIndex: 50,
-                background: "rgba(14,14,18,0.97)",
+                background: "var(--popover-bg)",
                 borderColor: "var(--line-strong)",
                 backdropFilter: "blur(16px)",
-                boxShadow: "0 8px 32px rgba(0,0,0,0.5)",
+                boxShadow: "var(--popover-shadow)",
               }}
             >
               <p style={{ fontFamily: "var(--font-jb-mono)", fontSize: 11, color: "var(--muted)", marginBottom: 12, lineHeight: 1.5 }}>
@@ -185,7 +185,7 @@ export function Navbar() {
       {menuOpen && (
         <nav
           className="border-t px-5 py-4 md:hidden"
-          style={{ borderColor: "var(--line)", background: "rgba(7,7,9,0.95)", backdropFilter: "blur(12px)" }}
+          style={{ borderColor: "var(--line)", background: "var(--drawer-bg)", backdropFilter: "blur(12px)" }}
           aria-label="Mobile navigation"
         >
           {NAV_ITEMS.map(({ num, label, href }) => (

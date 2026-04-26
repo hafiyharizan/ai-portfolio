@@ -37,6 +37,9 @@ export function Atmosphere() {
     }));
 
     function tick() {
+      const particleRgb =
+        getComputedStyle(document.documentElement).getPropertyValue("--particle-rgb").trim() ||
+        "237,237,240";
       ctx.clearRect(0, 0, innerWidth, innerHeight);
       for (const p of particles) {
         p.x += p.vx;
@@ -46,7 +49,7 @@ export function Atmosphere() {
         if (p.y < 0) p.y = innerHeight;
         if (p.y > innerHeight) p.y = 0;
         ctx.beginPath();
-        ctx.fillStyle = `rgba(237,237,240,${p.a})`;
+        ctx.fillStyle = `rgba(${particleRgb},${p.a})`;
         ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
         ctx.fill();
       }
@@ -80,7 +83,7 @@ export function Atmosphere() {
             width: 700, height: 700,
             top: "-20%", right: "-12%",
             background: "var(--accent)",
-            opacity: 0.22,
+            opacity: "var(--blob-primary-opacity)",
           }}
         />
         <div
@@ -89,7 +92,7 @@ export function Atmosphere() {
             width: 520, height: 520,
             bottom: "-18%", left: "-10%",
             background: "var(--accent-hot)",
-            opacity: 0.18,
+            opacity: "var(--blob-secondary-opacity)",
             animationDelay: "-10s",
           }}
         />
@@ -99,7 +102,7 @@ export function Atmosphere() {
           style={{
             opacity: 0.5,
             backgroundImage:
-              "linear-gradient(to right, rgba(255,255,255,0.025) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.025) 1px, transparent 1px)",
+              "linear-gradient(to right, rgba(var(--grid-line-rgb), var(--grid-line-alpha)) 1px, transparent 1px), linear-gradient(to bottom, rgba(var(--grid-line-rgb), var(--grid-line-alpha)) 1px, transparent 1px)",
             backgroundSize: "64px 64px",
             maskImage: "radial-gradient(ellipse 80% 60% at 70% 50%, black 30%, transparent 85%)",
           }}

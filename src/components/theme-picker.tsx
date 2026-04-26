@@ -1,19 +1,29 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { Monitor, Moon, Sun } from "lucide-react";
 import {
+  applyAppearanceMode,
   applyCustomHue,
   applyPreset,
+  DEFAULT_APPEARANCE_MODE,
   DEFAULT_THEME,
+  getStoredAppearanceMode,
   isThemeName,
   THEMES,
   THEME_STORAGE_KEY,
+  type AppearanceMode,
   type ThemeName,
 } from "@/lib/theme";
 
 type ThemePickerProps = { mode?: "desktop" | "mobile" };
 
 const DEFAULT_HUE = 31;
+const APPEARANCE_OPTIONS = [
+  { mode: "light", label: "Light", Icon: Sun },
+  { mode: "dark", label: "Dark", Icon: Moon },
+  { mode: "auto", label: "Auto", Icon: Monitor },
+] as const;
 
 function getStoredState(): { active: ThemeName | "custom"; hue: number } {
   if (typeof window === "undefined") return { active: DEFAULT_THEME, hue: DEFAULT_HUE };
@@ -30,16 +40,31 @@ function getStoredState(): { active: ThemeName | "custom"; hue: number } {
 
 export function ThemePicker({ mode = "desktop" }: ThemePickerProps) {
   const [active, setActive] = useState<ThemeName | "custom">(DEFAULT_THEME);
+  const [appearanceMode, setAppearanceMode] = useState<AppearanceMode>(DEFAULT_APPEARANCE_MODE);
   const [hue, setHue] = useState(DEFAULT_HUE);
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const { active: a, hue: h } = getStoredState();
-    setActive(a);
-    setHue(h);
-    if (a === "custom") applyCustomHue(h);
+    const timeout = window.setTimeout(() => {
+      const { active: a, hue: h } = getStoredState();
+      const storedAppearance = getStoredAppearanceMode();
+      setActive(a);
+      setHue(h);
+      setAppearanceMode(storedAppearance);
+      applyAppearanceMode(storedAppearance);
+      if (a === "custom") applyCustomHue(h);
+    }, 0);
+    return () => window.clearTimeout(timeout);
   }, []);
+
+  useEffect(() => {
+    if (appearanceMode !== "auto") return;
+    const media = window.matchMedia("(prefers-color-scheme: dark)");
+    const onChange = () => applyAppearanceMode("auto");
+    media.addEventListener("change", onChange);
+    return () => media.removeEventListener("change", onChange);
+  }, [appearanceMode]);
 
   useEffect(() => {
     if (!open) return;
@@ -63,6 +88,11 @@ export function ThemePicker({ mode = "desktop" }: ThemePickerProps) {
     applyCustomHue(h);
   };
 
+  const handleAppearance = (nextMode: AppearanceMode) => {
+    setAppearanceMode(nextMode);
+    applyAppearanceMode(nextMode);
+  };
+
   const currentColor =
     active === "custom"
       ? `oklch(0.72 0.18 ${hue})`
@@ -70,6 +100,47 @@ export function ThemePicker({ mode = "desktop" }: ThemePickerProps) {
 
   const panel = (
     <>
+      <p
+        style={{
+          fontFamily: "var(--font-jb-mono)",
+          fontSize: 10,
+          letterSpacing: "0.1em",
+          textTransform: "uppercase",
+          color: "var(--muted-foreground)",
+          marginBottom: 8,
+        }}
+      >
+        Mode
+      </p>
+      <div
+        className="mb-4 grid grid-cols-3 gap-1 rounded-lg border p-1"
+        style={{ borderColor: "var(--line)", background: "var(--bg-soft)" }}
+      >
+        {APPEARANCE_OPTIONS.map(({ mode: optionMode, label, Icon }) => {
+          const isActive = appearanceMode === optionMode;
+          return (
+            <button
+              key={optionMode}
+              type="button"
+              onClick={() => handleAppearance(optionMode)}
+              className="inline-flex items-center justify-center gap-1.5 rounded-md px-2 py-1.5 transition-all duration-150"
+              style={{
+                fontFamily: "var(--font-jb-mono)",
+                fontSize: 10,
+                color: isActive ? "var(--foreground)" : "var(--muted)",
+                background: isActive ? "var(--control-active-bg)" : "transparent",
+                border: `1px solid ${isActive ? "var(--accent-line)" : "transparent"}`,
+              }}
+              aria-pressed={isActive}
+              title={`${label} mode`}
+            >
+              <Icon className="h-3 w-3" strokeWidth={2} />
+              {label}
+            </button>
+          );
+        })}
+      </div>
+
       <p
         style={{
           fontFamily: "var(--font-jb-mono)",
@@ -95,7 +166,7 @@ export function ThemePicker({ mode = "desktop" }: ThemePickerProps) {
                 fontFamily: "var(--font-jb-mono)",
                 fontSize: 10,
                 color: isActive ? "var(--foreground)" : "var(--muted)",
-                background: isActive ? "rgba(255,255,255,0.06)" : "transparent",
+                background: isActive ? "var(--control-active-bg)" : "transparent",
                 border: `1px solid ${isActive ? "var(--accent-line)" : "transparent"}`,
               }}
             >
@@ -204,10 +275,10 @@ export function ThemePicker({ mode = "desktop" }: ThemePickerProps) {
             top: "100%",
             width: 216,
             zIndex: 50,
-            background: "rgba(14,14,18,0.97)",
+            background: "var(--popover-bg)",
             borderColor: "var(--line-strong)",
             backdropFilter: "blur(16px)",
-            boxShadow: "0 8px 32px rgba(0,0,0,0.5)",
+            boxShadow: "var(--popover-shadow)",
           }}
         >
           {panel}

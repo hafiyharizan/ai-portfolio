@@ -4,7 +4,14 @@ import { Geist, JetBrains_Mono } from "next/font/google";
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
 import { Atmosphere } from "@/components/atmosphere";
-import { DEFAULT_THEME, THEME_NAMES, THEME_STORAGE_KEY } from "@/lib/theme";
+import {
+  APPEARANCE_MODES,
+  APPEARANCE_STORAGE_KEY,
+  DEFAULT_APPEARANCE_MODE,
+  DEFAULT_THEME,
+  THEME_NAMES,
+  THEME_STORAGE_KEY,
+} from "@/lib/theme";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -58,7 +65,18 @@ export const metadata: Metadata = {
 const themeInitScript = `(() => {
   try {
     const themes = ${JSON.stringify(THEME_NAMES)};
+    const appearanceModes = ${JSON.stringify(APPEARANCE_MODES)};
     const stored = window.localStorage.getItem("${THEME_STORAGE_KEY}");
+    const storedAppearance = window.localStorage.getItem("${APPEARANCE_STORAGE_KEY}");
+    const appearanceMode = storedAppearance && appearanceModes.includes(storedAppearance)
+      ? storedAppearance
+      : "${DEFAULT_APPEARANCE_MODE}";
+    const resolvedAppearance = appearanceMode === "auto"
+      ? (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light")
+      : appearanceMode;
+    document.documentElement.dataset.appearanceMode = appearanceMode;
+    document.documentElement.dataset.appearance = resolvedAppearance;
+    document.documentElement.style.colorScheme = resolvedAppearance;
     if (stored && stored.startsWith("custom:")) {
       const hue = parseFloat(stored.slice(7));
       if (!isNaN(hue)) {
@@ -79,6 +97,7 @@ const themeInitScript = `(() => {
     }
   } catch {
     document.documentElement.dataset.theme = "${DEFAULT_THEME}";
+    document.documentElement.dataset.appearanceMode = "${DEFAULT_APPEARANCE_MODE}";
   }
 })();`;
 
@@ -90,6 +109,7 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${jbMono.variable}`}
       data-theme={DEFAULT_THEME}
+      data-appearance-mode={DEFAULT_APPEARANCE_MODE}
       suppressHydrationWarning
     >
       <body className="grain min-h-screen bg-background text-foreground antialiased">

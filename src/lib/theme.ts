@@ -1,5 +1,7 @@
 export const THEME_STORAGE_KEY = "hafiy-theme";
+export const APPEARANCE_STORAGE_KEY = "hafiy-appearance";
 export const DEFAULT_THEME = "forest-green" as const;
+export const DEFAULT_APPEARANCE_MODE = "auto" as const;
 
 export const THEMES = [
   { name: "forest-green",    label: "Ember",  accent: "#d97b42", accentHot: "#e8963a", hue: 31  },
@@ -8,11 +10,39 @@ export const THEMES = [
 ] as const;
 
 export type ThemeName = (typeof THEMES)[number]["name"];
+export const APPEARANCE_MODES = ["light", "dark", "auto"] as const;
+export type AppearanceMode = (typeof APPEARANCE_MODES)[number];
+export type ResolvedAppearance = Exclude<AppearanceMode, "auto">;
 
 export const THEME_NAMES = THEMES.map((t) => t.name);
 
 export function isThemeName(value: string): value is ThemeName {
   return THEMES.some((t) => t.name === value);
+}
+
+export function isAppearanceMode(value: string): value is AppearanceMode {
+  return APPEARANCE_MODES.includes(value as AppearanceMode);
+}
+
+export function getStoredAppearanceMode(): AppearanceMode {
+  if (typeof window === "undefined") return DEFAULT_APPEARANCE_MODE;
+  const stored = window.localStorage.getItem(APPEARANCE_STORAGE_KEY);
+  return stored && isAppearanceMode(stored) ? stored : DEFAULT_APPEARANCE_MODE;
+}
+
+export function resolveAppearanceMode(mode: AppearanceMode): ResolvedAppearance {
+  if (mode !== "auto") return mode;
+  if (typeof window === "undefined") return "dark";
+  return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+}
+
+export function applyAppearanceMode(mode: AppearanceMode) {
+  const root = document.documentElement;
+  const resolved = resolveAppearanceMode(mode);
+  root.dataset.appearanceMode = mode;
+  root.dataset.appearance = resolved;
+  root.style.colorScheme = resolved;
+  window.localStorage.setItem(APPEARANCE_STORAGE_KEY, mode);
 }
 
 export function applyCustomHue(hue: number) {
