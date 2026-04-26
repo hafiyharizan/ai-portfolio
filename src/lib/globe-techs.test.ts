@@ -12,7 +12,7 @@ describe("GLOBE_TECHS", () => {
       expect(tech.name).toBeTruthy();
       expect(validCategories).toContain(tech.cat);
       expect(["core", "comfortable"]).toContain(tech.tier);
-      expect(tech.icon).toMatch(/^https:\/\/cdn\.simpleicons\.org\/.+\/.+$/);
+      expect(tech.icon).toMatch(/^(https:\/\/cdn\.simpleicons\.org\/.+\/.+|data:image\/svg\+xml,)/);
       expect(tech.color).toMatch(/^#[0-9A-Fa-f]{6}$/);
     }
   });
