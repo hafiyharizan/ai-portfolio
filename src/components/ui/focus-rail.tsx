@@ -114,7 +114,7 @@ export function FocusRail({
   return (
     <div
       className={cn(
-        "group relative flex h-[600px] w-full flex-col overflow-hidden text-white outline-none select-none overflow-x-hidden",
+        "group relative flex h-[540px] w-full flex-col overflow-hidden text-white outline-none select-none overflow-x-hidden",
         className
       )}
       onMouseEnter={() => setIsHovering(true)}
@@ -126,7 +126,7 @@ export function FocusRail({
       {/* Main stage */}
       <div className="relative z-10 flex flex-1 flex-col justify-center px-4 md:px-8">
         <motion.div
-          className="relative mx-auto flex h-[360px] w-full max-w-6xl items-center justify-center cursor-grab active:cursor-grabbing"
+          className="relative mx-auto flex h-[300px] w-full max-w-6xl items-center justify-center cursor-grab active:cursor-grabbing"
           style={{ perspective: 1200 }}
           drag="x"
           dragConstraints={{ left: 0, right: 0 }}
@@ -143,7 +143,7 @@ export function FocusRail({
             const isCenter = offset === 0;
             const dist = Math.abs(offset);
 
-            const xOffset = offset * 320;
+            const xOffset = offset * 430;
             const zOffset = -dist * 180;
             const scale = isCenter ? 1 : 0.85;
             const rotateY = offset * -20;
@@ -155,8 +155,8 @@ export function FocusRail({
               <motion.div
                 key={absIndex}
                 className={cn(
-                  "absolute aspect-[3/4] w-[260px] md:w-[300px] rounded-2xl border-t border-white/20 bg-neutral-900 shadow-2xl",
-                  isCenter ? "z-20 shadow-white/10" : "z-10"
+                  "absolute flex flex-col overflow-hidden aspect-[16/10] w-[340px] md:w-[420px] rounded-2xl bg-neutral-900 shadow-2xl",
+                  isCenter ? "z-20 ring-1 ring-white/10" : "z-10"
                 )}
                 initial={false}
                 animate={{
@@ -176,19 +176,28 @@ export function FocusRail({
                   if (offset !== 0) setActive((p) => p + offset);
                 }}
               >
-                <img
-                  src={item.imageSrc}
-                  alt={item.title}
-                  onError={(e) => {
-                    const img = e.currentTarget;
-                    if (!img.src.includes("picsum")) {
-                      img.src = `https://picsum.photos/seed/${String(item.id).toLowerCase().replace(/\s+/g, "-")}/600/800`;
-                    }
-                  }}
-                  className="h-full w-full rounded-2xl object-cover pointer-events-none"
-                />
-                <div className="absolute inset-0 rounded-2xl bg-gradient-to-b from-white/10 to-transparent pointer-events-none" />
-                <div className="absolute inset-0 rounded-2xl bg-black/10 pointer-events-none mix-blend-multiply" />
+                {/* Browser chrome header */}
+                <div className="flex h-7 shrink-0 items-center gap-1.5 border-b border-white/[0.07] bg-neutral-950/60 px-3">
+                  <div className="h-2.5 w-2.5 rounded-full bg-red-500/70" />
+                  <div className="h-2.5 w-2.5 rounded-full bg-yellow-500/70" />
+                  <div className="h-2.5 w-2.5 rounded-full bg-green-500/70" />
+                  <div className="ml-2 h-3.5 flex-1 rounded-sm bg-white/[0.07]" />
+                </div>
+                {/* Screenshot */}
+                <div className="relative flex-1 overflow-hidden">
+                  <img
+                    src={item.imageSrc}
+                    alt={item.title}
+                    onError={(e) => {
+                      const img = e.currentTarget;
+                      if (!img.src.includes("picsum")) {
+                        img.src = `https://picsum.photos/seed/${String(item.id).toLowerCase().replace(/\s+/g, "-")}/1600/1000`;
+                      }
+                    }}
+                    className="h-full w-full object-cover object-top pointer-events-none"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent pointer-events-none" />
+                </div>
               </motion.div>
             );
           })}
