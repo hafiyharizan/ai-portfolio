@@ -120,7 +120,7 @@ function PerthClock() {
           </span>
           <span
             className="text-4xl font-bold"
-            style={{ color: "var(--muted-foreground)" }}
+            style={{ color: "var(--muted)" }}
           >
             :
           </span>
@@ -129,7 +129,7 @@ function PerthClock() {
           </span>
           <span
             className="text-4xl font-bold"
-            style={{ color: "var(--muted-foreground)" }}
+            style={{ color: "var(--muted)" }}
           >
             :
           </span>

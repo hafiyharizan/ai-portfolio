@@ -143,7 +143,7 @@ export function FocusRail({
             const isCenter = offset === 0;
             const dist = Math.abs(offset);
 
-            const xOffset = offset * 430;
+            const xOffset = offset * 380;
             const zOffset = -dist * 180;
             const scale = isCenter ? 1 : 0.85;
             const rotateY = offset * -20;
@@ -155,7 +155,7 @@ export function FocusRail({
               <motion.div
                 key={absIndex}
                 className={cn(
-                  "absolute flex flex-col overflow-hidden aspect-[16/10] w-[340px] md:w-[420px] rounded-2xl bg-neutral-900 shadow-2xl",
+                  "absolute flex flex-col overflow-hidden aspect-[16/10] w-[300px] md:w-[420px] rounded-2xl bg-neutral-900 shadow-2xl",
                   isCenter ? "z-20 ring-1 ring-white/10" : "z-10"
                 )}
                 initial={false}
@@ -205,7 +205,7 @@ export function FocusRail({
 
         {/* Info & controls */}
         <div className="mx-auto mt-12 flex w-full max-w-4xl flex-col items-center justify-between gap-6 md:flex-row pointer-events-auto">
-          <div className="flex flex-1 flex-col items-center text-center md:items-start md:text-left h-32 justify-center">
+          <div className="flex flex-1 flex-col items-center text-center md:items-start md:text-left min-h-[96px] justify-center">
             <AnimatePresence mode="wait">
               <motion.div
                 key={activeItem.id}

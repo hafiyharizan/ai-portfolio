@@ -159,7 +159,7 @@
   --blob-primary-opacity: 0.06;
   --blob-secondary-opacity: 0.04;
   --blob-blend-mode: multiply;
-  --bento-card-bg: #ffffff;
+  --bento-card-bg: rgba(255,255,255,0.88);
   --bento-card-border: rgba(23,26,24,0.10);
   --bento-spotlight: rgba(0,0,0,0.04);
   --bento-edge: rgba(23,26,24,0.06);
@@ -449,15 +449,6 @@ body {
     grid-template-columns: 1fr;
     grid-template-rows: auto;
     gap: 10px;
-  }
-  .about-bento .cell-photo,
-  .about-bento .cell-summary,
-  .about-bento .cell-xp,
-  .about-bento .cell-clock,
-  .about-bento .cell-edu,
-  .about-bento .cell-interests {
-    grid-column: 1;
-    grid-row: auto;
   }
   .about-bento .cell-photo { min-height: 320px; }
 }
