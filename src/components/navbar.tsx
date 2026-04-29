@@ -1,185 +1,113 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState } from "react";
 import { SITE_CONFIG } from "@/lib/constants";
 import { ThemePicker } from "@/components/theme-picker";
 
 const NAV_ITEMS = [
-  { num: "01", label: "Work",    href: "#projects" },
-  { num: "02", label: "Stack",   href: "#skills" },
-  { num: "03", label: "About",   href: "#about" },
-  { num: "04", label: "Contact", href: "#contact" },
+  { label: "Home",     href: "#" },
+  { label: "About",    href: "#about" },
+  { label: "Projects", href: "#projects" },
+  { label: "Skills",   href: "#skills" },
+  { label: "Contact",  href: "#contact" },
 ];
 
 export function Navbar() {
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [emailPrompt, setEmailPrompt] = useState(false);
-  const emailRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!emailPrompt) return;
-    const handler = (e: MouseEvent) => {
-      if (!emailRef.current?.contains(e.target as Node)) setEmailPrompt(false);
-    };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, [emailPrompt]);
+  const [menuOpen, setMenuOpen]         = useState(false);
+  const [contactHover, setContactHover] = useState(false);
 
   return (
     <header
-      className="relative z-10 border-b"
+      className="fixed left-0 right-0 top-0 z-50 border-b"
       style={{
         borderColor: "var(--line)",
         background: "var(--nav-bg)",
         backdropFilter: "blur(10px)",
       }}
     >
-    <div className="flex items-center justify-between px-5 py-4 sm:px-10 sm:py-[22px]">
-      {/* Mark */}
-      <a
-        href="#"
-        className="flex items-center gap-2.5"
-        style={{ fontFamily: "var(--font-jb-mono)", fontSize: 13, fontWeight: 500 }}
-        aria-label="Back to top"
-      >
-        <span
-          className="grid h-[26px] w-[26px] place-items-center rounded-[7px] text-[13px] font-bold"
+      <div className="flex h-[64px] items-center justify-between px-5 sm:px-10">
+
+        {/* Left: open to work / contact me */}
+        <a
+          href={`mailto:${SITE_CONFIG.email}`}
+          className="hidden md:inline-flex items-center gap-2 rounded-xl border px-4 py-2 text-sm transition-all duration-200"
           style={{
-            background: "linear-gradient(135deg, var(--accent), var(--accent-hot))",
-            color: "var(--accent-ink)",
-            letterSpacing: "-0.02em",
-            boxShadow: "0 0 20px var(--accent-soft)",
+            fontFamily: "var(--font-jb-mono)",
+            fontSize: 12,
+            color: contactHover ? "var(--accent)" : "var(--muted)",
+            borderColor: contactHover ? "var(--accent-line)" : "var(--line-strong)",
+            background: contactHover ? "var(--accent-soft)" : "var(--bg-soft)",
+          }}
+          onMouseEnter={() => setContactHover(true)}
+          onMouseLeave={() => setContactHover(false)}
+        >
+          <span
+            className="h-1.5 w-1.5 shrink-0 rounded-full transition-all duration-200"
+            style={{
+              background: contactHover ? "var(--accent)" : "var(--ok)",
+              boxShadow: contactHover ? "0 0 10px var(--accent)" : "0 0 10px var(--ok)",
+              animation: "pulse-ok 2s ease-in-out infinite",
+            }}
+          />
+          {contactHover ? "Contact me" : "Open to work"}
+        </a>
+
+        {/* Center: pill nav — desktop */}
+        <ul
+          className="hidden items-center gap-0.5 rounded-full border px-1.5 py-1 md:flex"
+          style={{
+            listStyle: "none",
+            borderColor: "var(--line-strong)",
+            background: "var(--bg-soft)",
           }}
         >
-          H
-        </span>
-        <span>
-          hafiy
-          <span style={{ color: "var(--muted-foreground)", marginLeft: 2 }}>.dev</span>
-        </span>
-      </a>
+          {NAV_ITEMS.map(({ label, href }) => (
+            <li key={href}>
+              <a
+                href={href}
+                className="inline-flex items-center rounded-full px-4 py-1.5 text-sm font-medium transition-all duration-150"
+                style={{ color: "var(--muted)", fontSize: 14 }}
+                onMouseEnter={(e) => {
+                  const el = e.currentTarget as HTMLElement;
+                  el.style.background = "var(--background)";
+                  el.style.color = "var(--foreground)";
+                  el.style.boxShadow = "0 1px 4px rgba(0,0,0,0.08)";
+                }}
+                onMouseLeave={(e) => {
+                  const el = e.currentTarget as HTMLElement;
+                  el.style.background = "";
+                  el.style.color = "var(--muted)";
+                  el.style.boxShadow = "";
+                }}
+              >
+                {label}
+              </a>
+            </li>
+          ))}
+        </ul>
 
-      {/* Desktop nav */}
-      <ul className="hidden items-center gap-1 md:flex" style={{ listStyle: "none" }}>
-        {NAV_ITEMS.map(({ num, label, href }) => (
-          <li key={href}>
-            <a
-              href={href}
-              className="inline-flex items-center gap-2 rounded-lg px-3.5 py-2 transition-colors duration-200"
-              style={{
-                fontFamily: "var(--font-jb-mono)",
-                fontSize: 12,
-                color: "var(--muted)",
-              }}
-              onMouseEnter={(e) => {
-                (e.currentTarget as HTMLElement).style.background = "var(--bg-soft)";
-                (e.currentTarget as HTMLElement).style.color = "var(--foreground)";
-              }}
-              onMouseLeave={(e) => {
-                (e.currentTarget as HTMLElement).style.background = "";
-                (e.currentTarget as HTMLElement).style.color = "var(--muted)";
-              }}
-            >
-              <span style={{ color: "var(--muted-foreground)", fontSize: 10 }}>{num}</span>
-              {label}
-            </a>
-          </li>
-        ))}
-      </ul>
+        {/* Right: theme toggle + mobile hamburger */}
+        <div className="flex items-center gap-2">
+          <div className="hidden md:block">
+            <ThemePicker />
+          </div>
 
-      {/* Tools */}
-      <div className="flex items-center gap-2.5">
-        <ThemePicker />
-
-        {/* Open to work status */}
-        <div className="relative" ref={emailRef}>
+          {/* Mobile hamburger */}
           <button
-            type="button"
-            onClick={() => setEmailPrompt((p) => !p)}
-            className="inline-flex items-center gap-2 rounded-lg border px-3 py-1.5 transition-colors duration-200"
-            style={{
-              fontFamily: "var(--font-jb-mono)",
-              fontSize: 11,
-              color: "var(--muted)",
-              borderColor: emailPrompt ? "var(--accent-line)" : "var(--line-strong)",
-              background: "var(--bg-soft)",
-            }}
+            className="grid h-9 w-9 place-items-center rounded-lg border md:hidden"
+            style={{ borderColor: "var(--line-strong)", background: "var(--bg-soft)", color: "var(--muted)" }}
+            onClick={() => setMenuOpen((p) => !p)}
+            aria-label={menuOpen ? "Close menu" : "Open menu"}
+            aria-expanded={menuOpen}
           >
-            <span
-              className="h-1.5 w-1.5 rounded-full"
-              style={{
-                background: "var(--ok)",
-                boxShadow: "0 0 10px var(--ok)",
-                animation: "pulse-ok 2s ease-in-out infinite",
-              }}
-            />
-            Open to work
+            {menuOpen ? (
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M6 6l12 12M18 6L6 18"/></svg>
+            ) : (
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+            )}
           </button>
-
-          {emailPrompt && (
-            <div
-              className="absolute right-0 mt-2 rounded-xl border p-4"
-              style={{
-                top: "100%",
-                width: 220,
-                zIndex: 50,
-                background: "var(--popover-bg)",
-                borderColor: "var(--line-strong)",
-                backdropFilter: "blur(16px)",
-                boxShadow: "var(--popover-shadow)",
-              }}
-            >
-              <p style={{ fontFamily: "var(--font-jb-mono)", fontSize: 11, color: "var(--muted)", marginBottom: 12, lineHeight: 1.5 }}>
-                Start an email to Hafiy?
-              </p>
-              <div className="flex gap-2">
-                <a
-                  href={`mailto:${SITE_CONFIG.email}`}
-                  onClick={() => setEmailPrompt(false)}
-                  className="flex-1 rounded-lg py-1.5 text-center transition-all duration-150"
-                  style={{
-                    fontFamily: "var(--font-jb-mono)",
-                    fontSize: 11,
-                    background: "var(--accent)",
-                    color: "var(--accent-ink)",
-                  }}
-                >
-                  Yes, open
-                </a>
-                <button
-                  type="button"
-                  onClick={() => setEmailPrompt(false)}
-                  className="flex-1 rounded-lg border py-1.5 transition-all duration-150"
-                  style={{
-                    fontFamily: "var(--font-jb-mono)",
-                    fontSize: 11,
-                    borderColor: "var(--line-strong)",
-                    color: "var(--muted)",
-                  }}
-                >
-                  Cancel
-                </button>
-              </div>
-            </div>
-          )}
         </div>
-
-        {/* Mobile hamburger */}
-        <button
-          className="grid h-9 w-9 place-items-center rounded-lg border md:hidden"
-          style={{ borderColor: "var(--line-strong)", background: "var(--bg-soft)", color: "var(--muted)" }}
-          onClick={() => setMenuOpen((p) => !p)}
-          aria-label={menuOpen ? "Close menu" : "Open menu"}
-          aria-expanded={menuOpen}
-        >
-          {menuOpen ? (
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M6 6l12 12M18 6L6 18"/></svg>
-          ) : (
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
-          )}
-        </button>
       </div>
-    </div>
 
       {/* Mobile drawer */}
       {menuOpen && (
@@ -188,12 +116,12 @@ export function Navbar() {
           style={{ borderColor: "var(--line)", background: "var(--drawer-bg)", backdropFilter: "blur(12px)" }}
           aria-label="Mobile navigation"
         >
-          {NAV_ITEMS.map(({ num, label, href }) => (
+          {NAV_ITEMS.map(({ label, href }) => (
             <a
               key={href}
               href={href}
               onClick={() => setMenuOpen(false)}
-              className="flex items-center gap-3 py-3"
+              className="flex items-center py-3"
               style={{
                 fontFamily: "var(--font-jb-mono)",
                 fontSize: 13,
@@ -201,18 +129,16 @@ export function Navbar() {
                 borderBottom: "1px solid var(--line)",
               }}
             >
-              <span style={{ color: "var(--muted-foreground)", fontSize: 10 }}>{num}</span>
               {label}
             </a>
           ))}
-          <ThemePicker mode="mobile" />
           <a
-            href={SITE_CONFIG.resumeUrl}
-            download
-            className="mt-3 inline-flex items-center gap-2 rounded-lg border px-3 py-2 text-sm"
-            style={{ borderColor: "var(--line-strong)", background: "var(--bg-soft)", color: "var(--muted)", fontFamily: "var(--font-jb-mono)" }}
+            href={`mailto:${SITE_CONFIG.email}`}
+            className="mt-4 inline-flex items-center gap-2 rounded-lg border px-3 py-2 text-sm"
+            style={{ borderColor: "var(--line-strong)", background: "var(--bg-soft)", color: "var(--muted)", fontFamily: "var(--font-jb-mono)", fontSize: 12 }}
           >
-            resume.pdf ↗
+            <span className="h-1.5 w-1.5 rounded-full" style={{ background: "var(--ok)", boxShadow: "0 0 8px var(--ok)" }} />
+            Contact me
           </a>
         </nav>
       )}

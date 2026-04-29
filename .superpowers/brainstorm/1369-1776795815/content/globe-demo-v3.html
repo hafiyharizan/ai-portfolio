@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Globe v3</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #07070f;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
+    overflow: hidden;
+  }
+
+  .label {
+    font-size: 10px;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    color: #3a3a52;
+    margin-bottom: 12px;
+  }
+
+  .title {
+    font-size: 44px;
+    font-weight: 700;
+    margin-bottom: 52px;
+    color: #eceaf5;
+    letter-spacing: -0.5px;
+  }
+  .title em { font-style: normal; color: #9d7cf7; }
+
+  /* ── Globe container ── */
+  .globe-wrap {
+    position: relative;
+    width: 500px;
+    height: 500px;
+    cursor: grab;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  .globe-wrap:active { cursor: grabbing; }
+
+  /*
+   * Sphere shell: two radial gradients simulate a lit 3D ball.
+   * Top-left = light source. Bottom-right = shadow.
+   * Edge darkening (limb) is handled by the outer radial.
+   */
+  .sphere {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background:
+      radial-gradient(ellipse at 32% 30%, rgba(155,120,255,0.20) 0%, transparent 48%),
+      radial-gradient(ellipse at 66% 66%, rgba(0,0,0,0.55) 0%, transparent 52%),
+      radial-gradient(circle at 50% 50%, rgba(14,9,38,0.65) 25%, rgba(3,1,13,0.97) 100%);
+    box-shadow:
+      0 0 0 1px rgba(110,80,230,0.13),
+      0 0 120px rgba(60,35,170,0.16),
+      inset 0 0 70px rgba(0,0,0,0.65),
+      inset 20px -15px 55px rgba(0,0,0,0.40);
+  }
+
+  /* specular highlight */
+  .sphere::after {
+    content: '';
+    position: absolute;
+    top: 7%;
+    left: 11%;
+    width: 36%;
+    height: 24%;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(210,195,255,0.065) 0%, transparent 65%);
+  }
+
+  /* Canvas sits above sphere, handles rotating grid */
+  #grid-canvas {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    pointer-events: none;
+    overflow: hidden;
+  }
+
+  /* Icon DOM nodes */
+  .node {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    pointer-events: auto;
+    will-change: transform, opacity, filter;
+    transform-origin: center center;
+  }
+
+  .node img {
+    width: 26px;
+    height: 26px;
+    object-fit: contain;
+    display: block;
+    pointer-events: none;
+  }
+
+  .node-label {
+    font-size: 8px;
+    font-weight: 500;
+    letter-spacing: 0.7px;
+    color: rgba(255,255,255,0.55);
+    white-space: nowrap;
+    line-height: 1;
+  }
+
+  /* ── Tooltip ── */
+  #tooltip {
+    position: absolute;
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0;
+    transition: opacity 0.12s ease;
+    transform: translateY(0);
+  }
+  #tooltip.show { opacity: 1; }
+
+  .tt-box {
+    background: rgba(8,5,24,0.90);
+    border: 1px solid rgba(130,100,255,0.26);
+    border-radius: 10px;
+    padding: 11px 15px 12px;
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    box-shadow: 0 16px 48px rgba(0,0,0,0.65), 0 0 0 1px rgba(120,90,255,0.07);
+    min-width: 118px;
+  }
+  .tt-name { font-size: 13px; font-weight: 600; color: #f0eeff; margin-bottom: 2px; letter-spacing: -0.1px; }
+  .tt-cat  { font-size: 10px; color: #484868; margin-bottom: 9px; }
+  .tt-tier {
+    font-size: 9px; font-weight: 700; letter-spacing: 1.1px;
+    text-transform: uppercase; padding: 3px 9px;
+    border-radius: 20px; display: inline-block;
+  }
+  .tier-core        { background: rgba(157,124,247,0.14); color: #b89cf9; border: 1px solid rgba(157,124,247,0.24); }
+  .tier-comfortable { background: rgba(80,150,255,0.12);  color: #80b5ff; border: 1px solid rgba(80,150,255,0.24); }
+
+  .hint {
+    margin-top: 28px;
+    font-size: 10px;
+    color: #252535;
+    letter-spacing: 1px;
+  }
+</style>
+</head>
+<body>
+
+<p class="label">Tech Stack</p>
+<h1 class="title">My <em>Skills</em></h1>
+
+<div class="globe-wrap" id="globe">
+  <div class="sphere"></div>
+  <canvas id="grid-canvas" width="500" height="500"></canvas>
+
+  <div id="tooltip">
+    <div class="tt-box">
+      <div class="tt-name" id="tt-name">—</div>
+      <div class="tt-cat"  id="tt-cat">—</div>
+      <span class="tt-tier" id="tt-tier">—</span>
+    </div>
+  </div>
+</div>
+
+<p class="hint">Drag to rotate &nbsp;·&nbsp; Hover to explore</p>
+
+<script>
+/* ── Tech data ─────────────────────────────────────────────── */
+const TECHS = [
+  { name:'JavaScript',  cat:'Frontend',   tier:'core',        icon:'https://cdn.simpleicons.org/javascript/F7DF1E',     color:'#F7DF1E' },
+  { name:'TypeScript',  cat:'Frontend',   tier:'core',        icon:'https://cdn.simpleicons.org/typescript/4C8EDA',     color:'#4C8EDA' },
+  { name:'React',       cat:'Frontend',   tier:'core',        icon:'https://cdn.simpleicons.org/react/61DAFB',          color:'#61DAFB' },
+  { name:'Next.js',     cat:'Frontend',   tier:'core',        icon:'https://cdn.simpleicons.org/nextdotjs/D8D8EE',      color:'#d0d0e8' },
+  { name:'Tailwind',    cat:'Frontend',   tier:'core',        icon:'https://cdn.simpleicons.org/tailwindcss/22D3EE',    color:'#22D3EE' },
+  { name:'Python',      cat:'Backend',    tier:'core',        icon:'https://cdn.simpleicons.org/python/FFD43B',         color:'#FFD43B' },
+  { name:'Node.js',     cat:'Backend',    tier:'comfortable', icon:'https://cdn.simpleicons.org/nodedotjs/74C948',      color:'#74C948' },
+  { name:'PostgreSQL',  cat:'Databases',  tier:'comfortable', icon:'https://cdn.simpleicons.org/postgresql/6589E8',     color:'#6589E8' },
+  { name:'Docker',      cat:'DevOps',     tier:'comfortable', icon:'https://cdn.simpleicons.org/docker/2496ED',         color:'#2496ED' },
+  { name:'Git',         cat:'DevOps',     tier:'core',        icon:'https://cdn.simpleicons.org/git/F05032',            color:'#F05032' },
+  { name:'GitHub',      cat:'DevOps',     tier:'core',        icon:'https://cdn.simpleicons.org/github/C8C8E0',         color:'#C8C8E0' },
+  { name:'Azure AI',    cat:'AI & Cloud', tier:'comfortable', icon:'https://cdn.simpleicons.org/microsoftazure/3B90F5', color:'#3B90F5' },
+  { name:'Power BI',    cat:'Data & Viz', tier:'comfortable', icon:'https://cdn.simpleicons.org/powerbi/F2C811',        color:'#F2C811' },
+  { name:'Pandas',      cat:'Data & Viz', tier:'comfortable', icon:'https://cdn.simpleicons.org/pandas/C8A0F0',         color:'#C8A0F0' },
+];
+
+/* ── Globe constants ───────────────────────────────────────── */
+const CX = 250, CY = 250;
+const R   = 178;   // sphere radius px
+const FOV = 420;   // lower = more perspective distortion = more 3D feel
+
+/*
+ * COORDINATE SYSTEM:
+ *   After rot(), viewer looks along +Z axis (into screen).
+ *   z < 0  → near side  (FRONT, facing viewer)
+ *   z > 0  → far side   (BACK,  facing away)
+ *   depth  = (1 - z) / 2   →  front = 1, back = 0
+ */
+
+/* ── Geometry ──────────────────────────────────────────────── */
+function fibSphere(n) {
+  const pts = [], phi = Math.PI * (3 - Math.sqrt(5));
+  for (let i = 0; i < n; i++) {
+    const y = 1 - (i / (n - 1)) * 2;
+    const r = Math.sqrt(1 - y * y);
+    const t = phi * i;
+    pts.push([Math.cos(t) * r, y, Math.sin(t) * r]);
+  }
+  return pts;
+}
+
+function latCircle(latDeg, steps = 64) {
+  const lat = latDeg * Math.PI / 180;
+  const cy = Math.sin(lat), r = Math.cos(lat);
+  return Array.from({length: steps + 1}, (_, i) => {
+    const lon = (2 * Math.PI * i) / steps;
+    return [Math.cos(lon) * r, cy, Math.sin(lon) * r];
+  });
+}
+
+function lonCircle(lonDeg, steps = 64) {
+  const lon = lonDeg * Math.PI / 180;
+  return Array.from({length: steps + 1}, (_, i) => {
+    const lat = Math.PI * i / steps - Math.PI / 2;
+    return [Math.cos(lat) * Math.cos(lon), Math.sin(lat), Math.cos(lat) * Math.sin(lon)];
+  });
+}
+
+const ICON_POS = fibSphere(TECHS.length);
+
+/* Pre-build grid lines. 5 lat + 4 lon great circles. */
+const GRID_LINES = [
+  ...[-55, -27.5, 0, 27.5, 55].map(latCircle),
+  ...[0, 45, 90, 135].map(lonCircle),
+];
+
+/* ── Rotation + projection ─────────────────────────────────── */
+function rot([x, y, z], rx, ry) {
+  const cy = Math.cos(ry), sy = Math.sin(ry);
+  const x1 = x * cy + z * sy;
+  const z1 = -x * sy + z * cy;
+  const cx = Math.cos(rx), sx = Math.sin(rx);
+  const y2 = y * cx - z1 * sx;
+  const z2 = y * sx + z1 * cx;
+  return [x1, y2, z2];
+}
+
+function project([x, y, z]) {
+  /* z < 0 = near (FRONT). Scale is LARGER for near points. */
+  const s = FOV / (FOV + z * R);
+  return { sx: CX + x * R * s, sy: CY + y * R * s, z };
+}
+
+/* ── State ─────────────────────────────────────────────────── */
+let rotX = 0.28, rotY = 0.4;
+let velX = 0, velY = 0.0022;
+let dragging = false, ptrX = 0, ptrY = 0;
+let lastInteract = -Infinity;
+let hovered = -1;
+
+/* ── DOM ───────────────────────────────────────────────────── */
+const globeEl = document.getElementById('globe');
+const canvas  = document.getElementById('grid-canvas');
+const ctx     = canvas.getContext('2d');
+const tooltip = document.getElementById('tooltip');
+const ttName  = document.getElementById('tt-name');
+const ttCat   = document.getElementById('tt-cat');
+const ttTier  = document.getElementById('tt-tier');
+
+const nodes = TECHS.map((t, i) => {
+  const el = document.createElement('div');
+  el.className = 'node';
+  el.innerHTML = `<img src="${t.icon}" alt="${t.name}"><span class="node-label">${t.name}</span>`;
+  el.style.position = 'absolute';
+  globeEl.appendChild(el);
+  el.addEventListener('mouseenter', () => hovered = i);
+  el.addEventListener('mouseleave', () => { hovered = -1; tooltip.classList.remove('show'); });
+  return el;
+});
+
+/* ── Canvas grid ───────────────────────────────────────────── */
+function drawGrid() {
+  ctx.clearRect(0, 0, 500, 500);
+
+  GRID_LINES.forEach(linePts => {
+    ctx.beginPath();
+    let penDown = false;
+
+    linePts.forEach(pt => {
+      const [rx, ry, rz] = rot(pt, rotX, rotY);
+
+      /* Only draw front hemisphere. z < 0 = front side. */
+      if (rz > 0.04) { penDown = false; return; }
+
+      const { sx, sy } = project([rx, ry, rz]);
+
+      /* Alpha: brightest at z=-1 (dead-center front), zero at edge (z=0). */
+      /* We use -rz because rz is negative on front; we want 0→1. */
+      const edgeFade = Math.max(0, -rz);
+      const alpha = edgeFade * 0.32;
+
+      ctx.strokeStyle = `rgba(120,88,240,${alpha.toFixed(2)})`;
+      ctx.lineWidth = 0.65;
+
+      if (!penDown) {
+        ctx.moveTo(sx, sy);
+        penDown = true;
+      } else {
+        ctx.lineTo(sx, sy);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(sx, sy);
+      }
+    });
+  });
+}
+
+/* ── Main loop ─────────────────────────────────────────────── */
+let lastTs = 0;
+
+function frame(ts) {
+  requestAnimationFrame(frame);
+  lastTs = ts;
+
+  if (!dragging) {
+    const idle = ts - lastInteract;
+    const auto = idle > 2400 ? Math.min(1, (idle - 2400) / 500) : 0;
+    velY += (0.0022 * auto - velY) * 0.025;
+    velX *= 0.92;
+    rotY += velY;
+    rotX += velX;
+    /* Gentle X wobble */
+    rotX += Math.sin(ts * 0.00020) * 0.00018;
+    rotX = Math.max(-0.48, Math.min(0.48, rotX));
+  }
+
+  drawGrid();
+
+  /* Project icon positions */
+  const proj = ICON_POS.map((p, i) => {
+    const [rx, ry, rz] = rot(p, rotX, rotY);
+    const { sx, sy, z } = project([rx, ry, rz]);
+    return { sx, sy, z, i };
+  });
+
+  /* Painter's sort: back-to-front (largest z first, since z < 0 = front) */
+  proj.sort((a, b) => b.z - a.z);
+
+  proj.forEach(({ sx, sy, z, i }) => {
+    const el   = nodes[i];
+    const isH  = i === hovered;
+
+    /*
+     * depth: front face = 1, back face = 0
+     * z < 0 → near → high depth
+     * CORRECTED formula: depth = (1 - z) / 2
+     * z = -1 (front): depth = 1.0
+     * z =  0 (equator): depth = 0.5
+     * z = +1 (back):  depth = 0.0
+     */
+    const depth = (1 - z) / 2;
+
+    /* Cull icons that are deeply behind the sphere */
+    const visible = depth > 0.06;
+
+    const opacity = isH ? 1
+      : !visible ? 0
+      : Math.pow(depth, 0.65) * 0.92 + 0.04;
+
+    const blurPx = isH ? 0 : Math.max(0, (1 - depth) * 2.8);
+
+    /* Scale: front icons noticeably bigger than back icons */
+    const depthScale = 0.52 + depth * 0.48;
+    const finalScale = isH ? depthScale * 1.42 : depthScale;
+
+    const zIdx = Math.round((1 - z) * 600); /* higher = in front */
+
+    el.style.left      = sx + 'px';
+    el.style.top       = sy + 'px';
+    el.style.opacity   = opacity.toFixed(3);
+    el.style.zIndex    = visible ? zIdx : -1;
+    el.style.transform = `translate(-50%,-54%) scale(${finalScale.toFixed(3)})`;
+
+    if (isH) {
+      const c = TECHS[i].color;
+      el.style.filter = `drop-shadow(0 0 10px ${c}aa) drop-shadow(0 0 4px ${c}66)`;
+      el.style.filter += ' brightness(1.15)';
+
+      const offX = sx > CX ? 40 : -(130 + 40);
+      tooltip.style.left = (sx + offX) + 'px';
+      tooltip.style.top  = (sy - 28) + 'px';
+      ttName.textContent = TECHS[i].name;
+      ttCat.textContent  = TECHS[i].cat;
+      ttTier.textContent = TECHS[i].tier.charAt(0).toUpperCase() + TECHS[i].tier.slice(1);
+      ttTier.className   = 'tt-tier tier-' + TECHS[i].tier;
+      tooltip.classList.add('show');
+    } else {
+      el.style.filter = blurPx > 0.1 ? `blur(${blurPx.toFixed(1)}px)` : 'none';
+    }
+  });
+}
+
+/* ── Pointer events ────────────────────────────────────────── */
+globeEl.addEventListener('pointerdown', e => {
+  dragging = true;
+  ptrX = e.clientX; ptrY = e.clientY;
+  globeEl.setPointerCapture(e.pointerId);
+  e.preventDefault();
+});
+
+globeEl.addEventListener('pointermove', e => {
+  if (!dragging) return;
+  const dx = e.clientX - ptrX;
+  const dy = e.clientY - ptrY;
+  /* Weighted drag: slight resistance */
+  velY = dx * 0.0042;
+  velX = dy * 0.0042;
+  rotY += velY;
+  rotX += velX;
+  ptrX = e.clientX; ptrY = e.clientY;
+  lastInteract = performance.now();
+});
+
+globeEl.addEventListener('pointerup', () => {
+  dragging = false;
+  lastInteract = performance.now();
+});
+
+requestAnimationFrame(ts => { lastTs = ts; requestAnimationFrame(frame); });
+</script>
+</body>
+</html>

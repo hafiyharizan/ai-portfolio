@@ -1,0 +1,44 @@
+<h2>Globe Implementation Approach</h2>
+<p class="subtitle">Which rendering strategy for the rotating tech globe?</p>
+
+<div class="options">
+
+  <div class="option" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>Three.js + React Three Fiber</h3>
+      <p>True WebGL 3D globe. Icons as sprites pinned to sphere surface. Closest match to the pszostak.pl reference — glowing mesh, proper depth, smooth inertia drag. Adds ~400KB (gzipped) to bundle.</p>
+      <div class="pros-cons" style="margin-top:10px">
+        <div class="pros"><h4>Pros</h4><ul><li>Most realistic 3D effect</li><li>Proper perspective & depth sort</li><li>Inertia on drag feels natural</li></ul></div>
+        <div class="cons"><h4>Cons</h4><ul><li>Large dependency (~400KB gz)</li><li>More complex setup</li></ul></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>CSS 3D + Trigonometry</h3>
+      <p>No new deps. Icons positioned using sin/cos math, rendered as DOM elements with CSS <code>perspective</code> + <code>transform: translateZ</code>. Depth-fade via opacity. Uses Framer Motion for drag + rotation.</p>
+      <div class="pros-cons" style="margin-top:10px">
+        <div class="pros"><h4>Pros</h4><ul><li>Zero new dependencies</li><li>Full React/Tailwind styling on icons</li><li>Easy hover state &amp; tooltips</li></ul></div>
+        <div class="cons"><h4>Cons</h4><ul><li>No real depth sorting (icons overlap wrong at edges)</li><li>Less immersive than WebGL</li></ul></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="c" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>Canvas 2D + Sphere Projection</h3>
+      <p>Draw everything on an HTML Canvas. Sphere grid lines + icons drawn as canvas images. Handles depth-sort correctly. No new deps, good perf.</p>
+      <div class="pros-cons" style="margin-top:10px">
+        <div class="pros"><h4>Pros</h4><ul><li>Zero new deps</li><li>Correct depth sorting</li><li>Good performance</li></ul></div>
+        <div class="cons"><h4>Cons</h4><ul><li>Harder to style icons (canvas draws, not DOM)</li><li>Tooltip/hover needs manual hit-testing</li><li>Less crisp on retina screens</li></ul></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<p class="subtitle" style="margin-top:1.5rem">Click your preferred approach, then let me know in the terminal.</p>

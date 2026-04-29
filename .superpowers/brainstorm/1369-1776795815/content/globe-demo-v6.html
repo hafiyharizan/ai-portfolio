@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Globe v6 — True 3D</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #0b0b14;
+    overflow: hidden;
+    font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
+  }
+
+  /* Three.js canvas fills the screen */
+  #c { position: fixed; inset: 0; display: block; }
+
+  /* ── Heading ── */
+  .heading {
+    position: fixed;
+    top: 44px;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    z-index: 20;
+    pointer-events: none;
+    white-space: nowrap;
+  }
+  .s-label {
+    display: block;
+    font-size: 10px;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    color: #33334a;
+    margin-bottom: 10px;
+  }
+  .s-title {
+    font-size: 44px;
+    font-weight: 700;
+    color: #eceaf5;
+    letter-spacing: -0.5px;
+    line-height: 1;
+  }
+  .s-title em { font-style: normal; color: #9d7cf7; }
+
+  /* ── Icon layer ── */
+  #icon-layer {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 10;
+  }
+
+  .pin {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    pointer-events: auto;
+    cursor: default;
+    will-change: transform, opacity, filter;
+    transform-origin: 50% 50%;
+    transition: filter 0.15s ease;
+  }
+
+  .pin img {
+    width: 36px;
+    height: 36px;
+    object-fit: contain;
+    display: block;
+    pointer-events: none;
+  }
+
+  .pin .plabel {
+    font-size: 9px;
+    font-weight: 500;
+    letter-spacing: 0.6px;
+    color: rgba(255,255,255,0.55);
+    white-space: nowrap;
+    line-height: 1;
+    transition: color 0.15s;
+  }
+
+  .pin.active .plabel {
+    color: rgba(255,255,255,0.95);
+    font-weight: 600;
+  }
+
+  /* ── Tooltip ── */
+  #tooltip {
+    position: fixed;
+    z-index: 30;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.12s ease;
+  }
+  #tooltip.show { opacity: 1; }
+
+  .tt {
+    background: rgba(7,5,22,0.93);
+    border: 1px solid rgba(120,90,245,0.26);
+    border-radius: 10px;
+    padding: 12px 16px 13px;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    box-shadow: 0 20px 50px rgba(0,0,0,0.7);
+    min-width: 120px;
+  }
+  .tt-name { font-size: 13px; font-weight: 600; color: #f0eeff; margin-bottom: 2px; }
+  .tt-cat  { font-size: 10px; color: #3e3e58; margin-bottom: 9px; }
+  .tt-tier { font-size: 9px; font-weight: 700; letter-spacing: 1.1px; text-transform: uppercase; padding: 3px 9px; border-radius: 20px; display: inline-block; }
+  .t-core        { background: rgba(157,124,247,0.14); color: #b49cf8; border: 1px solid rgba(157,124,247,0.24); }
+  .t-comfortable { background: rgba(78,148,255,0.12);  color: #7eb5ff; border: 1px solid rgba(78,148,255,0.24); }
+
+  .hint {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 10px;
+    color: #1c1c2e;
+    letter-spacing: 1px;
+    z-index: 20;
+    pointer-events: none;
+    white-space: nowrap;
+  }
+</style>
+</head>
+<body>
+
+<canvas id="c"></canvas>
+
+<div class="heading">
+  <span class="s-label">Tech Stack</span>
+  <h1 class="s-title">My <em>Skills</em></h1>
+</div>
+
+<div id="icon-layer"></div>
+
+<div id="tooltip">
+  <div class="tt">
+    <div class="tt-name" id="tt-name">—</div>
+    <div class="tt-cat"  id="tt-cat">—</div>
+    <span class="tt-tier" id="tt-tier">—</span>
+  </div>
+</div>
+
+<p class="hint">Drag to rotate &nbsp;·&nbsp; Hover to explore</p>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.161.0/build/three.module.js"
+  }
+}
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+
+/* ─────────────────────────────────────────────────────────────
+   Tech data
+───────────────────────────────────────────────────────────── */
+const TECHS = [
+  { name:'JavaScript',  cat:'Frontend',   tier:'core',        icon:'https://cdn.simpleicons.org/javascript/F7DF1E',     color:'#F7DF1E' },
+  { name:'TypeScript',  cat:'Frontend',   tier:'core',        icon:'https://cdn.simpleicons.org/typescript/4C8EDA',     color:'#4C8EDA' },
+  { name:'React',       cat:'Frontend',   tier:'core',        icon:'https://cdn.simpleicons.org/react/61DAFB',          color:'#61DAFB' },
+  { name:'Next.js',     cat:'Frontend',   tier:'core',        icon:'https://cdn.simpleicons.org/nextdotjs/D4D4EE',      color:'#D4D4EE' },
+  { name:'Node.js',     cat:'Backend',    tier:'comfortable', icon:'https://cdn.simpleicons.org/nodedotjs/74C948',      color:'#74C948' },
+  { name:'Python',      cat:'Backend',    tier:'core',        icon:'https://cdn.simpleicons.org/python/FFD43B',         color:'#FFD43B' },
+  { name:'PostgreSQL',  cat:'Databases',  tier:'comfortable', icon:'https://cdn.simpleicons.org/postgresql/6589E8',     color:'#6589E8' },
+  { name:'Docker',      cat:'DevOps',     tier:'comfortable', icon:'https://cdn.simpleicons.org/docker/2496ED',         color:'#2496ED' },
+  { name:'GitHub',      cat:'DevOps',     tier:'core',        icon:'https://cdn.simpleicons.org/github/C0C0DC',         color:'#C0C0DC' },
+  { name:'Tailwind',    cat:'Frontend',   tier:'core',        icon:'https://cdn.simpleicons.org/tailwindcss/22D3EE',    color:'#22D3EE' },
+  { name:'Figma',       cat:'Design',     tier:'comfortable', icon:'https://cdn.simpleicons.org/figma/F24E1E',          color:'#F24E1E' },
+  { name:'Power BI',    cat:'Data & Viz', tier:'comfortable', icon:'https://cdn.simpleicons.org/powerbi/F2C811',        color:'#F2C811' },
+  { name:'AWS',         cat:'Cloud',      tier:'comfortable', icon:'https://cdn.simpleicons.org/amazonaws/FF9900',      color:'#FF9900' },
+];
+
+/* ─────────────────────────────────────────────────────────────
+   Scene
+───────────────────────────────────────────────────────────── */
+const canvas   = document.getElementById('c');
+let W = window.innerWidth, H = window.innerHeight;
+
+const scene    = new THREE.Scene();
+const camera   = new THREE.PerspectiveCamera(55, W/H, 1, 10000);
+camera.position.set(0, 0, 1100);
+
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setSize(W, H);
+renderer.setClearColor(0x0b0b14, 1);
+
+/* ─────────────────────────────────────────────────────────────
+   Starfield — random dots far in background
+───────────────────────────────────────────────────────────── */
+(function () {
+  const verts = [];
+  for (let i = 0; i < 2200; i++) {
+    verts.push(
+      (Math.random() - 0.5) * 9000,
+      (Math.random() - 0.5) * 9000,
+      (Math.random() - 0.5) * 9000 - 1500
+    );
+  }
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.Float32BufferAttribute(verts, 3));
+  scene.add(new THREE.Points(geo, new THREE.PointsMaterial({
+    color: 0xffffff, size: 1.2, transparent: true, opacity: 0.35, sizeAttenuation: true
+  })));
+})();
+
+/* ─────────────────────────────────────────────────────────────
+   Globe group — everything inside here rotates together
+───────────────────────────────────────────────────────────── */
+const R          = 390;
+const globeGroup = new THREE.Group();
+scene.add(globeGroup);
+
+/*
+ * Inner fill sphere — dark, solid.
+ * Gives depth to the wireframe (back lines appear to be "inside" the sphere).
+ * Using MeshBasicMaterial with depthWrite:true so it occludes objects behind it.
+ */
+const fillMesh = new THREE.Mesh(
+  new THREE.SphereGeometry(R - 1, 48, 32),
+  new THREE.MeshBasicMaterial({ color: 0x0d0d1a, transparent: false })
+);
+globeGroup.add(fillMesh);
+
+/*
+ * Wireframe — EdgesGeometry on a SphereGeometry gives clean lat/lon grid,
+ * not noisy triangle diagonals.
+ * depthTest: true so back-face lines are occluded by the fill sphere — this
+ * is what makes it look like a SOLID 3D globe instead of an X-ray hollow shell.
+ */
+const wireGeo = new THREE.EdgesGeometry(new THREE.SphereGeometry(R, 22, 16));
+const wireMat = new THREE.LineBasicMaterial({
+  color:       0x4455cc,
+  transparent: true,
+  opacity:     0.45,
+  depthTest:   true,
+});
+globeGroup.add(new THREE.LineSegments(wireGeo, wireMat));
+
+/*
+ * Outer atmospheric glow — slightly larger sphere, inside-out (BackSide),
+ * adds a soft purple halo around the globe edge.
+ */
+const haloMesh = new THREE.Mesh(
+  new THREE.SphereGeometry(R * 1.06, 32, 32),
+  new THREE.MeshBasicMaterial({
+    color:       0x3322aa,
+    transparent: true,
+    opacity:     0.06,
+    side:        THREE.BackSide,
+    blending:    THREE.AdditiveBlending,
+    depthTest:   false,
+  })
+);
+scene.add(haloMesh); // static — doesn't rotate with globe
+
+/* ─────────────────────────────────────────────────────────────
+   Icon anchor positions (fibonacci sphere, unit vectors)
+───────────────────────────────────────────────────────────── */
+function fibSphereUnit(n) {
+  const pts = [], phi = Math.PI * (3 - Math.sqrt(5));
+  for (let i = 0; i < n; i++) {
+    const y  = 1 - (i / (n - 1)) * 2;
+    const rr = Math.sqrt(1 - y * y);
+    const t  = phi * i;
+    pts.push(new THREE.Vector3(Math.cos(t) * rr, y, Math.sin(t) * rr));
+  }
+  return pts;
+}
+
+const iconUnits = fibSphereUnit(TECHS.length); // unit vectors
+const iconWorld = iconUnits.map(v => v.clone().multiplyScalar(R)); // local positions
+
+/* ─────────────────────────────────────────────────────────────
+   DOM icon pins
+───────────────────────────────────────────────────────────── */
+const iconLayer = document.getElementById('icon-layer');
+const tooltip   = document.getElementById('tooltip');
+const ttName    = document.getElementById('tt-name');
+const ttCat     = document.getElementById('tt-cat');
+const ttTier    = document.getElementById('tt-tier');
+let   hovered   = -1;
+
+const pins = TECHS.map((t, i) => {
+  const el = document.createElement('div');
+  el.className = 'pin';
+  el.innerHTML = `<img src="${t.icon}" alt="${t.name}"><span class="plabel">${t.name}</span>`;
+  el.style.position = 'absolute';
+  iconLayer.appendChild(el);
+  el.addEventListener('mouseenter', () => hovered = i);
+  el.addEventListener('mouseleave', () => { hovered = -1; tooltip.classList.remove('show'); });
+  return el;
+});
+
+/* ─────────────────────────────────────────────────────────────
+   Drag + rotation state
+───────────────────────────────────────────────────────────── */
+let velY = 0.0022, velX = 0;
+let dragging = false, pX = 0, pY = 0;
+
+canvas.addEventListener('pointerdown', e => {
+  dragging = true;
+  pX = e.clientX; pY = e.clientY;
+  canvas.setPointerCapture(e.pointerId);
+  e.preventDefault();
+});
+
+window.addEventListener('pointermove', e => {
+  if (!dragging) return;
+  const dx = e.clientX - pX;
+  const dy = e.clientY - pY;
+  velY = dx * 0.0045;
+  velX = dy * 0.0030;
+  globeGroup.rotation.y += velY;
+  globeGroup.rotation.x  = Math.max(-0.65, Math.min(0.65, globeGroup.rotation.x + velX));
+  pX = e.clientX; pY = e.clientY;
+});
+
+window.addEventListener('pointerup', () => { dragging = false; });
+
+/* ─────────────────────────────────────────────────────────────
+   Resize
+───────────────────────────────────────────────────────────── */
+window.addEventListener('resize', () => {
+  W = window.innerWidth; H = window.innerHeight;
+  camera.aspect = W / H;
+  camera.updateProjectionMatrix();
+  renderer.setSize(W, H);
+});
+
+/* ─────────────────────────────────────────────────────────────
+   Render loop
+───────────────────────────────────────────────────────────── */
+const tmp = new THREE.Vector3();
+
+function animate() {
+  requestAnimationFrame(animate);
+
+  /* ── Rotation update ── */
+  if (!dragging) {
+    /*
+     * Blend velY towards target auto-speed.
+     * After fast drag, velY decays naturally; auto-rotation resumes smoothly.
+     */
+    const autoY = hovered >= 0 ? 0.0006 : 0.0022;
+    velY = velY * 0.938 + autoY * 0.062;
+    velX = velX * 0.90;
+  }
+
+  globeGroup.rotation.y += velY;
+  globeGroup.rotation.x  = Math.max(-0.65, Math.min(0.65, globeGroup.rotation.x + velX));
+
+  /* ── Project icon pins ── */
+  /*
+   * Camera is at +Z looking toward origin.
+   * For each icon, rotate its unit-sphere normal by the globe's current rotation,
+   * then check Z: positive Z = faces camera (front), negative Z = faces away (back).
+   */
+  const euler = globeGroup.rotation; // Euler object
+
+  iconWorld.forEach((localPt, i) => {
+    /* Rotate local position by globe orientation → world position */
+    tmp.copy(localPt).applyEuler(euler);
+
+    /* Facing: rotated unit normal's Z component */
+    const facing = iconUnits[i].clone().applyEuler(euler).z;
+    const depth  = (facing + 1) / 2; // 0 = back, 1 = front
+
+    /* NDC → screen */
+    const projected = tmp.clone().project(camera);
+    const sx = ( projected.x + 1) / 2 * W;
+    const sy = (-projected.y + 1) / 2 * H;
+
+    const isH    = i === hovered;
+    const opacity = isH ? 1
+      : facing > 0 ? Math.pow(facing, 0.48) * 0.90 + 0.08
+      : Math.max(0.0, facing * 0.08 + 0.05); // nearly invisible behind
+
+    /* Front icons up to 1.55×, back icons down to 0.5× */
+    const scale  = isH ? 1.65 : 0.50 + depth * 0.50;
+
+    /* Subtle blur only for deep back-face icons */
+    const blurPx = (facing < -0.4 && !isH) ? Math.min(2.2, (-facing - 0.4) * 3.5) : 0;
+
+    const zIdx = isH ? 999 : Math.round(depth * 800);
+
+    const el = pins[i];
+    el.style.left      = sx + 'px';
+    el.style.top       = sy + 'px';
+    el.style.opacity   = opacity.toFixed(3);
+    el.style.zIndex    = zIdx;
+    el.style.transform = `translate(-50%, -54%) scale(${scale.toFixed(3)})`;
+    el.classList.toggle('active', isH);
+
+    if (isH) {
+      const c = TECHS[i].color;
+      el.style.filter = `drop-shadow(0 0 10px ${c}cc) drop-shadow(0 0 4px ${c}88) brightness(1.15)`;
+
+      const side = sx > W/2 ? 44 : -(130 + 44);
+      tooltip.style.left = (sx + side) + 'px';
+      tooltip.style.top  = (sy - 24)   + 'px';
+      ttName.textContent = TECHS[i].name;
+      ttCat.textContent  = TECHS[i].cat;
+      ttTier.textContent = TECHS[i].tier.charAt(0).toUpperCase() + TECHS[i].tier.slice(1);
+      ttTier.className   = 'tt-tier t-' + TECHS[i].tier;
+      tooltip.classList.add('show');
+    } else {
+      el.style.filter = blurPx > 0.1 ? `blur(${blurPx.toFixed(1)}px)` : 'none';
+    }
+  });
+
+  renderer.render(scene, camera);
+}
+
+animate();
+</script>
+</body>
+</html>

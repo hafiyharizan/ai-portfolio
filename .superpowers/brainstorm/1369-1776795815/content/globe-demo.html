@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Globe Demo</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #080810;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    color: #fff;
+    overflow: hidden;
+  }
+
+  .section-label {
+    font-size: 11px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: #555;
+    margin-bottom: 10px;
+  }
+
+  .section-title {
+    font-size: 42px;
+    font-weight: 700;
+    margin-bottom: 48px;
+    color: #f0f0f5;
+  }
+
+  .section-title span { color: #a78bfa; }
+
+  .globe-wrap {
+    position: relative;
+    width: 460px;
+    height: 460px;
+    cursor: grab;
+    user-select: none;
+  }
+
+  .globe-wrap:active { cursor: grabbing; }
+
+  /* Globe visual sphere */
+  .globe-sphere {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: radial-gradient(
+      circle at 38% 38%,
+      rgba(120, 90, 255, 0.12) 0%,
+      rgba(20, 15, 55, 0.7) 55%,
+      rgba(4, 2, 18, 0.92) 100%
+    );
+    border: 1px solid rgba(120, 90, 255, 0.12);
+    box-shadow:
+      0 0 80px rgba(80, 50, 200, 0.18),
+      inset 0 0 80px rgba(0, 0, 0, 0.6);
+  }
+
+  /* Highlight shimmer */
+  .globe-sphere::after {
+    content: '';
+    position: absolute;
+    top: 8%;
+    left: 14%;
+    width: 40%;
+    height: 30%;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(180,160,255,0.08) 0%, transparent 70%);
+  }
+
+  .icon-node {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    pointer-events: auto;
+    will-change: transform, opacity;
+  }
+
+  .icon-img-wrap {
+    width: 38px;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.08);
+    transition: background 0.2s, border-color 0.2s;
+  }
+
+  .icon-node.hovered .icon-img-wrap {
+    background: rgba(255,255,255,0.12);
+    border-color: rgba(255,255,255,0.25);
+  }
+
+  .icon-img {
+    width: 22px;
+    height: 22px;
+    object-fit: contain;
+    display: block;
+  }
+
+  .icon-name {
+    font-size: 9px;
+    font-weight: 500;
+    letter-spacing: 0.4px;
+    color: rgba(255,255,255,0.6);
+    white-space: nowrap;
+    text-align: center;
+  }
+
+  /* Tooltip */
+  .tooltip {
+    position: absolute;
+    pointer-events: none;
+    background: rgba(10, 8, 30, 0.92);
+    border: 1px solid rgba(140, 110, 255, 0.35);
+    border-radius: 10px;
+    padding: 12px 16px;
+    z-index: 10000;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+    backdrop-filter: blur(12px);
+    min-width: 130px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5), 0 0 0 1px rgba(140,110,255,0.1);
+  }
+
+  .tooltip.show { opacity: 1; }
+
+  .tt-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: #f0f0f5;
+    margin-bottom: 2px;
+  }
+
+  .tt-category {
+    font-size: 10px;
+    color: #666;
+    margin-bottom: 8px;
+  }
+
+  .tt-tier {
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 20px;
+    display: inline-block;
+  }
+
+  .tier-core    { background: rgba(167,139,250,0.18); color: #a78bfa; border: 1px solid rgba(167,139,250,0.3); }
+  .tier-comfortable { background: rgba(96,165,250,0.18); color: #60a5fa; border: 1px solid rgba(96,165,250,0.3); }
+  .tier-learning { background: rgba(52,211,153,0.18); color: #34d399; border: 1px solid rgba(52,211,153,0.3); }
+
+  .hint {
+    position: absolute;
+    bottom: -40px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 11px;
+    color: #333;
+    white-space: nowrap;
+    letter-spacing: 0.5px;
+  }
+</style>
+</head>
+<body>
+
+<p class="section-label">TECH STACK</p>
+<h1 class="section-title">My <span>Skills</span></h1>
+
+<div class="globe-wrap" id="globe">
+  <div class="globe-sphere"></div>
+
+  <!-- SVG grid lines — static, subtle -->
+  <svg style="position:absolute;inset:0;width:100%;height:100%;border-radius:50%;overflow:hidden;opacity:0.18;pointer-events:none" viewBox="0 0 460 460">
+    <!-- Equator -->
+    <ellipse cx="230" cy="230" rx="225" ry="72" fill="none" stroke="#7c5ffa" stroke-width="0.8"/>
+    <!-- Tropic lines -->
+    <ellipse cx="230" cy="155" rx="178" ry="56" fill="none" stroke="#7c5ffa" stroke-width="0.6"/>
+    <ellipse cx="230" cy="305" rx="178" ry="56" fill="none" stroke="#7c5ffa" stroke-width="0.6"/>
+    <!-- Poles caps -->
+    <ellipse cx="230" cy="90"  rx="95"  ry="30" fill="none" stroke="#7c5ffa" stroke-width="0.5"/>
+    <ellipse cx="230" cy="370" rx="95"  ry="30" fill="none" stroke="#7c5ffa" stroke-width="0.5"/>
+    <!-- Vertical meridians -->
+    <ellipse cx="230" cy="230" rx="72"  ry="225" fill="none" stroke="#7c5ffa" stroke-width="0.6"/>
+    <ellipse cx="230" cy="230" rx="155" ry="225" fill="none" stroke="#7c5ffa" stroke-width="0.6"/>
+    <line x1="230" y1="5" x2="230" y2="455" stroke="#7c5ffa" stroke-width="0.6"/>
+  </svg>
+
+  <div class="tooltip" id="tooltip">
+    <div class="tt-name" id="tt-name">—</div>
+    <div class="tt-category" id="tt-cat">—</div>
+    <span class="tt-tier" id="tt-tier">—</span>
+  </div>
+
+  <p class="hint">Drag to rotate &nbsp;·&nbsp; Hover for details</p>
+</div>
+
+<script>
+const TECHS = [
+  { name: 'JavaScript',  category: 'Frontend',    tier: 'core',        icon: 'https://cdn.simpleicons.org/javascript/F7DF1E',       color: '#F7DF1E' },
+  { name: 'TypeScript',  category: 'Frontend',    tier: 'core',        icon: 'https://cdn.simpleicons.org/typescript/3178C6',       color: '#3178C6' },
+  { name: 'React',       category: 'Frontend',    tier: 'core',        icon: 'https://cdn.simpleicons.org/react/61DAFB',            color: '#61DAFB' },
+  { name: 'Next.js',     category: 'Frontend',    tier: 'core',        icon: 'https://cdn.simpleicons.org/nextdotjs/FFFFFF',        color: '#e0e0e0' },
+  { name: 'Tailwind',    category: 'Frontend',    tier: 'core',        icon: 'https://cdn.simpleicons.org/tailwindcss/06B6D4',      color: '#06B6D4' },
+  { name: 'Python',      category: 'Backend',     tier: 'core',        icon: 'https://cdn.simpleicons.org/python/FFD43B',           color: '#FFD43B' },
+  { name: 'Node.js',     category: 'Backend',     tier: 'comfortable', icon: 'https://cdn.simpleicons.org/nodedotjs/6CC24A',        color: '#6CC24A' },
+  { name: 'PostgreSQL',  category: 'Databases',   tier: 'comfortable', icon: 'https://cdn.simpleicons.org/postgresql/4169E1',       color: '#6488e8' },
+  { name: 'Docker',      category: 'DevOps',      tier: 'comfortable', icon: 'https://cdn.simpleicons.org/docker/2496ED',           color: '#2496ED' },
+  { name: 'Git',         category: 'DevOps',      tier: 'core',        icon: 'https://cdn.simpleicons.org/git/F05032',              color: '#F05032' },
+  { name: 'GitHub',      category: 'DevOps',      tier: 'core',        icon: 'https://cdn.simpleicons.org/github/E0E0E0',           color: '#E0E0E0' },
+  { name: 'Azure AI',    category: 'AI & Cloud',  tier: 'comfortable', icon: 'https://cdn.simpleicons.org/microsoftazure/0078D4',   color: '#0078D4' },
+  { name: 'Power BI',    category: 'Data & Viz',  tier: 'comfortable', icon: 'https://cdn.simpleicons.org/powerbi/F2C811',          color: '#F2C811' },
+  { name: 'Pandas',      category: 'Data & Viz',  tier: 'comfortable', icon: 'https://cdn.simpleicons.org/pandas/D4A0FF',           color: '#D4A0FF' },
+];
+
+// Fibonacci sphere — evenly spaced points on unit sphere
+function fibSphere(n) {
+  const pts = [];
+  const phi = Math.PI * (3 - Math.sqrt(5));
+  for (let i = 0; i < n; i++) {
+    const y = 1 - (i / (n - 1)) * 2;
+    const r = Math.sqrt(1 - y * y);
+    const t = phi * i;
+    pts.push([Math.cos(t) * r, y, Math.sin(t) * r]);
+  }
+  return pts;
+}
+
+const BASE_POSITIONS = fibSphere(TECHS.length);
+const CX = 230, CY = 230, R = 185, FOV = 700;
+
+let rotX = 0.3, rotY = 0.4;
+let velX = 0,   velY = 0.0028;
+let dragging = false, lastMX = 0, lastMY = 0;
+let lastInteract = 0;
+let hoveredIdx = -1;
+
+const globeEl   = document.getElementById('globe');
+const tooltip   = document.getElementById('tooltip');
+const ttName    = document.getElementById('tt-name');
+const ttCat     = document.getElementById('tt-cat');
+const ttTier    = document.getElementById('tt-tier');
+
+// Build DOM nodes
+const nodes = TECHS.map((t, i) => {
+  const el = document.createElement('div');
+  el.className = 'icon-node';
+  el.innerHTML = `
+    <div class="icon-img-wrap">
+      <img class="icon-img" src="${t.icon}" alt="${t.name}" loading="lazy">
+    </div>
+    <span class="icon-name">${t.name}</span>`;
+  el.style.position = 'absolute';
+  globeEl.appendChild(el);
+
+  el.addEventListener('mouseenter', () => {
+    hoveredIdx = i;
+    el.classList.add('hovered');
+  });
+  el.addEventListener('mouseleave', () => {
+    hoveredIdx = -1;
+    el.classList.remove('hovered');
+    tooltip.classList.remove('show');
+  });
+  return el;
+});
+
+function rotate([x, y, z], rx, ry) {
+  // Y rotation
+  const cy = Math.cos(ry), sy = Math.sin(ry);
+  const x1 = x * cy + z * sy;
+  const z1 = -x * sy + z * cy;
+  // X rotation
+  const cx2 = Math.cos(rx), sx2 = Math.sin(rx);
+  const y2 = y * cx2 - z1 * sx2;
+  const z2 = y * sx2 + z1 * cx2;
+  return [x1, y2, z2];
+}
+
+let lastTs = 0;
+
+function frame(ts) {
+  const dt = Math.min(ts - lastTs, 50); // cap dt
+  lastTs = ts;
+
+  if (!dragging) {
+    const idle = ts - lastInteract;
+    const auto = Math.min(1, Math.max(0, (idle - 2000) / 600));
+
+    // Blend velocity toward auto-rotation
+    velY += (0.0028 * auto - velY) * 0.03;
+    velX *= 0.94;
+
+    rotY += velY;
+    rotX += velX;
+
+    // Tiny wobble on X
+    rotX += Math.sin(ts * 0.00025) * 0.00025;
+    rotX = Math.clamp ? Math.clamp(rotX, -0.55, 0.55) : Math.max(-0.55, Math.min(0.55, rotX));
+  }
+
+  // Compute projected positions
+  const projected = BASE_POSITIONS.map((pos, i) => {
+    const [x, y, z] = rotate(pos, rotX, rotY);
+    const s = FOV / (FOV + z * R);
+    return { sx: CX + x * R * s, sy: CY + y * R * s, z, scale: s, i };
+  });
+
+  // Painter's sort (back to front)
+  projected.sort((a, b) => a.z - b.z);
+
+  projected.forEach(({ sx, sy, z, scale, i }) => {
+    const el    = nodes[i];
+    const depth = (z + 1) / 2;          // 0 = back, 1 = front
+    const isH   = i === hoveredIdx;
+
+    const opacity  = isH ? 1 : 0.18 + depth * 0.82;
+    const blurPx   = isH ? 0 : Math.max(0, (1 - depth) * 2.5);
+    const finalS   = isH ? scale * 1.35 : scale * (0.65 + depth * 0.35);
+    const zIdx     = Math.round((z + 1) * 500);
+
+    el.style.left      = sx + 'px';
+    el.style.top       = sy + 'px';
+    el.style.opacity   = opacity.toFixed(3);
+    el.style.zIndex    = zIdx;
+    el.style.transform = `translate(-50%, -50%) scale(${finalS.toFixed(3)})`;
+
+    if (isH) {
+      const glowColor = TECHS[i].color;
+      el.style.filter = `drop-shadow(0 0 10px ${glowColor}88)`;
+
+      // Position tooltip
+      const offX = sx > CX ? 38 : -168;
+      const offY = -22;
+      tooltip.style.left    = (sx + offX) + 'px';
+      tooltip.style.top     = (sy + offY) + 'px';
+      ttName.textContent    = TECHS[i].name;
+      ttCat.textContent     = TECHS[i].category;
+      ttTier.textContent    = TECHS[i].tier.charAt(0).toUpperCase() + TECHS[i].tier.slice(1);
+      ttTier.className      = 'tt-tier tier-' + TECHS[i].tier;
+      tooltip.classList.add('show');
+    } else {
+      el.style.filter = blurPx > 0.1 ? `blur(${blurPx.toFixed(1)}px)` : 'none';
+    }
+  });
+
+  requestAnimationFrame(frame);
+}
+
+// Drag
+globeEl.addEventListener('pointerdown', e => {
+  dragging = true;
+  lastMX = e.clientX;
+  lastMY = e.clientY;
+  globeEl.setPointerCapture(e.pointerId);
+  e.preventDefault();
+});
+
+globeEl.addEventListener('pointermove', e => {
+  if (!dragging) return;
+  const dx = e.clientX - lastMX;
+  const dy = e.clientY - lastMY;
+  velY = dx * 0.005;
+  velX = dy * 0.005;
+  rotY += velY;
+  rotX += velX;
+  lastMX = e.clientX;
+  lastMY = e.clientY;
+  lastInteract = performance.now();
+});
+
+globeEl.addEventListener('pointerup', e => {
+  dragging = false;
+  lastInteract = performance.now();
+});
+
+requestAnimationFrame(ts => { lastTs = ts; requestAnimationFrame(frame); });
+</script>
+</body>
+</html>

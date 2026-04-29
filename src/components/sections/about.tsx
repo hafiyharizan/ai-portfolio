@@ -296,7 +296,7 @@ export function About() {
           {/* ── Photo ──────────────────────────────────────────────────── */}
           <BentoCard cellClass="cell-photo">
             <Image
-              src="/avatar.png"
+              src="/hero-avatar.png"
               alt="Hafiy Harizan"
               fill
               className="object-cover object-top"

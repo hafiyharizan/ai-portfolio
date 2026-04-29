@@ -65,6 +65,17 @@ export const PERSONAL_PROJECTS = [
     href: "https://fishos-seven.vercel.app/",
     featured: false,
   },
+  {
+    name: "ApplySmart AI",
+    tagline: "AI-powered Resume & Cover Letter Tailor",
+    description:
+      "Helps job seekers compare resumes to job descriptions, uncover fit gaps, generate tailored cover letters, prepare for interviews, and track application progress — all in one polished AI workflow.",
+    tags: ["Next.js", "TypeScript", "Azure AI", "Tailwind CSS"],
+    icon: "sparkles",
+    color: "#3b5bdb",
+    href: "https://tailor-swift-eight.vercel.app/",
+    featured: true,
+  },
 ] as const;
 
 export const PROFESSIONAL_PROJECTS = [
@@ -167,7 +178,7 @@ export const SKILLS = {
     "PostgreSQL", "MySQL", "MariaDB", "Query Optimization", "Data Modelling", "ELT",
   ],
   "AI & Cloud": [
-    "Azure AI Studio", "Azure OpenAI", "Azure ML", "Prompt Engineering", "Model Deployment",
+    "Azure AI Studio", "Azure OpenAI", "Azure ML", "Prompt Engineering", "Model Deployment", "Agentic AI",
   ],
   "Data & Viz": [
     "Power BI", "Tableau", "Leaflet.js", "AmCharts", "Pandas", "NumPy",

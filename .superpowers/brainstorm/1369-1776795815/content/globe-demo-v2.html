@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Globe v2</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #07070f;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
+    color: #fff;
+    overflow: hidden;
+  }
+
+  .label {
+    font-size: 10px;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    color: #44445a;
+    margin-bottom: 12px;
+  }
+
+  .title {
+    font-size: 44px;
+    font-weight: 700;
+    margin-bottom: 52px;
+    color: #ececf4;
+    letter-spacing: -0.5px;
+  }
+  .title em { font-style: normal; color: #9d7cf7; }
+
+  /* ── Globe ── */
+  .globe-wrap {
+    position: relative;
+    width: 500px;
+    height: 500px;
+    cursor: grab;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  .globe-wrap:active { cursor: grabbing; }
+
+  /* Atmospheric sphere */
+  .sphere {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background:
+      radial-gradient(circle at 36% 34%, rgba(130, 95, 255, 0.10) 0%, transparent 55%),
+      radial-gradient(circle at 50% 50%, rgba(14, 10, 42, 0.85) 40%, rgba(4, 2, 16, 0.97) 100%);
+    box-shadow:
+      0 0 0 1px rgba(110, 80, 240, 0.10),
+      0 0 100px rgba(70, 40, 180, 0.14),
+      inset 0 0 90px rgba(0, 0, 0, 0.7);
+  }
+
+  /* Edge rim glow */
+  .sphere::before {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border-radius: 50%;
+    background: transparent;
+    box-shadow: inset 0 0 0 1.5px rgba(120, 90, 255, 0.18);
+  }
+
+  /* Top-left specular */
+  .sphere::after {
+    content: '';
+    position: absolute;
+    top: 7%;
+    left: 12%;
+    width: 38%;
+    height: 26%;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(200, 185, 255, 0.055) 0%, transparent 70%);
+  }
+
+  /* Canvas for rotating dot grid */
+  #grid-canvas {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    pointer-events: none;
+  }
+
+  /* Icon nodes */
+  .node {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    pointer-events: auto;
+    will-change: transform, opacity, filter;
+  }
+
+  .node img {
+    width: 28px;
+    height: 28px;
+    object-fit: contain;
+    display: block;
+    pointer-events: none;
+  }
+
+  .node-label {
+    font-size: 8.5px;
+    font-weight: 500;
+    letter-spacing: 0.6px;
+    color: rgba(255, 255, 255, 0.5);
+    white-space: nowrap;
+  }
+
+  /* ── Tooltip ── */
+  #tooltip {
+    position: absolute;
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0;
+    transition: opacity 0.12s ease;
+  }
+  #tooltip.show { opacity: 1; }
+
+  .tt-inner {
+    background: rgba(8, 6, 26, 0.88);
+    border: 1px solid rgba(130, 100, 255, 0.28);
+    border-radius: 10px;
+    padding: 11px 15px 13px;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.6), 0 0 0 1px rgba(130,100,255,0.08);
+    min-width: 120px;
+  }
+
+  .tt-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: #f0eeff;
+    margin-bottom: 3px;
+    letter-spacing: -0.1px;
+  }
+
+  .tt-cat {
+    font-size: 10px;
+    color: #505070;
+    margin-bottom: 10px;
+  }
+
+  .tt-tier {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    padding: 3px 9px;
+    border-radius: 20px;
+    display: inline-block;
+  }
+  .tier-core        { background: rgba(157,124,247,0.15); color: #b89cf9; border: 1px solid rgba(157,124,247,0.25); }
+  .tier-comfortable { background: rgba(80,150,255,0.13);  color: #82b8ff; border: 1px solid rgba(80,150,255,0.25); }
+  .tier-learning    { background: rgba(50,200,140,0.13);  color: #5de8b0; border: 1px solid rgba(50,200,140,0.25); }
+
+  .hint {
+    margin-top: 28px;
+    font-size: 10px;
+    color: #2a2a3a;
+    letter-spacing: 1px;
+  }
+</style>
+</head>
+<body>
+
+<p class="label">Tech Stack</p>
+<h1 class="title">My <em>Skills</em></h1>
+
+<div class="globe-wrap" id="globe">
+  <div class="sphere"></div>
+  <canvas id="grid-canvas" width="500" height="500"></canvas>
+
+  <div id="tooltip">
+    <div class="tt-inner">
+      <div class="tt-name" id="tt-name">—</div>
+      <div class="tt-cat"  id="tt-cat">—</div>
+      <span class="tt-tier" id="tt-tier">—</span>
+    </div>
+  </div>
+</div>
+
+<p class="hint">Drag to rotate &nbsp;·&nbsp; Hover to explore</p>
+
+<script>
+/* ── Data ───────────────────────────────────────────── */
+const TECHS = [
+  { name:'JavaScript',  cat:'Frontend',   tier:'core',        icon:'https://cdn.simpleicons.org/javascript/F7DF1E',     color:'#F7DF1E' },
+  { name:'TypeScript',  cat:'Frontend',   tier:'core',        icon:'https://cdn.simpleicons.org/typescript/4C8EDA',     color:'#4C8EDA' },
+  { name:'React',       cat:'Frontend',   tier:'core',        icon:'https://cdn.simpleicons.org/react/61DAFB',          color:'#61DAFB' },
+  { name:'Next.js',     cat:'Frontend',   tier:'core',        icon:'https://cdn.simpleicons.org/nextdotjs/E8E8F0',      color:'#d0d0e8' },
+  { name:'Tailwind',    cat:'Frontend',   tier:'core',        icon:'https://cdn.simpleicons.org/tailwindcss/22D3EE',    color:'#22D3EE' },
+  { name:'Python',      cat:'Backend',    tier:'core',        icon:'https://cdn.simpleicons.org/python/FFD43B',         color:'#FFD43B' },
+  { name:'Node.js',     cat:'Backend',    tier:'comfortable', icon:'https://cdn.simpleicons.org/nodedotjs/74C948',      color:'#74C948' },
+  { name:'PostgreSQL',  cat:'Databases',  tier:'comfortable', icon:'https://cdn.simpleicons.org/postgresql/6589E8',     color:'#6589E8' },
+  { name:'Docker',      cat:'DevOps',     tier:'comfortable', icon:'https://cdn.simpleicons.org/docker/2496ED',         color:'#2496ED' },
+  { name:'Git',         cat:'DevOps',     tier:'core',        icon:'https://cdn.simpleicons.org/git/F05032',            color:'#F05032' },
+  { name:'GitHub',      cat:'DevOps',     tier:'core',        icon:'https://cdn.simpleicons.org/github/D0D0E4',         color:'#D0D0E4' },
+  { name:'Azure AI',    cat:'AI & Cloud', tier:'comfortable', icon:'https://cdn.simpleicons.org/microsoftazure/3B90F5', color:'#3B90F5' },
+  { name:'Power BI',    cat:'Data & Viz', tier:'comfortable', icon:'https://cdn.simpleicons.org/powerbi/F2C811',        color:'#F2C811' },
+  { name:'Pandas',      cat:'Data & Viz', tier:'comfortable', icon:'https://cdn.simpleicons.org/pandas/C8A0F0',         color:'#C8A0F0' },
+];
+
+/* ── Globe geometry ──────────────────────────────────── */
+const CX = 250, CY = 250, R = 188, FOV = 720;
+
+function fibSphere(n) {
+  const pts = [], phi = Math.PI * (3 - Math.sqrt(5));
+  for (let i = 0; i < n; i++) {
+    const y = 1 - (i / (n - 1)) * 2;
+    const r = Math.sqrt(1 - y * y);
+    const t = phi * i;
+    pts.push([Math.cos(t) * r, y, Math.sin(t) * r]);
+  }
+  return pts;
+}
+
+// Rotating dot grid: lat/lon intersections
+function buildGrid() {
+  const pts = [];
+  const lats = 7, lons = 14;
+  for (let i = 1; i < lats; i++) {
+    const lat = Math.PI * i / lats - Math.PI / 2;
+    const cy = Math.sin(lat), r = Math.cos(lat);
+    for (let j = 0; j < lons; j++) {
+      const lon = (2 * Math.PI * j) / lons;
+      pts.push([Math.cos(lon) * r, cy, Math.sin(lon) * r]);
+    }
+  }
+  return pts;
+}
+
+const ICON_POS  = fibSphere(TECHS.length);
+const GRID_PTS  = buildGrid();
+
+/* ── State ───────────────────────────────────────────── */
+let rotX = 0.28, rotY = 0.4;
+let velX = 0, velY = 0.0026;
+let dragging = false, ptrX = 0, ptrY = 0;
+let lastInteract = -Infinity;
+let hovered = -1;
+
+/* ── DOM ─────────────────────────────────────────────── */
+const globeEl = document.getElementById('globe');
+const canvas  = document.getElementById('grid-canvas');
+const ctx     = canvas.getContext('2d');
+const tooltip = document.getElementById('tooltip');
+const ttName  = document.getElementById('tt-name');
+const ttCat   = document.getElementById('tt-cat');
+const ttTier  = document.getElementById('tt-tier');
+
+const nodes = TECHS.map((t, i) => {
+  const el = document.createElement('div');
+  el.className = 'node';
+  el.innerHTML = `<img src="${t.icon}" alt="${t.name}"><span class="node-label">${t.name}</span>`;
+  el.style.position = 'absolute';
+  globeEl.appendChild(el);
+  el.addEventListener('mouseenter', () => hovered = i);
+  el.addEventListener('mouseleave', () => { hovered = -1; tooltip.classList.remove('show'); });
+  return el;
+});
+
+/* ── Math ─────────────────────────────────────────────── */
+function rot([x, y, z], rx, ry) {
+  const cy = Math.cos(ry), sy = Math.sin(ry);
+  const x1 = x*cy + z*sy, z1 = -x*sy + z*cy;
+  const cx = Math.cos(rx), sx = Math.sin(rx);
+  return [x1, y*cx - z1*sx, y*sx + z1*cx];
+}
+
+function project([x, y, z]) {
+  const s = FOV / (FOV + z * R);
+  return { sx: CX + x*R*s, sy: CY + y*R*s, z, s };
+}
+
+/* ── Render ───────────────────────────────────────────── */
+let lastTs = 0;
+
+function frame(ts) {
+  requestAnimationFrame(frame);
+  const dt = Math.min(ts - lastTs, 50);
+  lastTs = ts;
+
+  if (!dragging) {
+    const idle = ts - lastInteract;
+    const auto = idle > 2400 ? Math.min(1, (idle - 2400) / 500) : 0;
+    velY += (0.0026 * auto - velY) * 0.025;
+    velX *= 0.93;
+    rotY += velY;
+    rotX += velX;
+    rotX += Math.sin(ts * 0.00022) * 0.00022; // gentle X wobble
+    rotX = Math.max(-0.5, Math.min(0.5, rotX));
+  }
+
+  /* ── Draw rotating dot grid on canvas ── */
+  ctx.clearRect(0, 0, 500, 500);
+  GRID_PTS.forEach(p => {
+    const [x, y, z] = rot(p, rotX, rotY);
+    if (z < -0.05) return; // cull backface
+    const { sx, sy } = project([x, y, z]);
+    const depth = (z + 1) / 2;
+    const alpha = 0.06 + depth * 0.18;
+    ctx.beginPath();
+    ctx.arc(sx, sy, 1.2, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(140,110,255,${alpha.toFixed(2)})`;
+    ctx.fill();
+  });
+
+  /* ── Position icon nodes ── */
+  const projected = ICON_POS.map((p, i) => {
+    const [x, y, z] = rot(p, rotX, rotY);
+    return { ...project([x, y, z]), i };
+  });
+  projected.sort((a, b) => a.z - b.z);
+
+  projected.forEach(({ sx, sy, z, s, i }) => {
+    const el    = nodes[i];
+    const isH   = i === hovered;
+    const depth = (z + 1) / 2;
+
+    const opacity = isH ? 1 : 0.12 + depth * 0.88;
+    const blur    = isH ? 0 : Math.max(0, (1 - depth) * 2.2);
+    const scale   = isH ? s * 1.4 : s * (0.62 + depth * 0.38);
+    const zIdx    = Math.round((z + 1) * 600);
+
+    el.style.left      = sx + 'px';
+    el.style.top       = sy + 'px';
+    el.style.opacity   = opacity.toFixed(3);
+    el.style.zIndex    = zIdx;
+    el.style.transform = `translate(-50%,-58%) scale(${scale.toFixed(3)})`;
+
+    if (isH) {
+      el.style.filter = `drop-shadow(0 0 9px ${TECHS[i].color}99) drop-shadow(0 0 3px ${TECHS[i].color}66)`;
+
+      const side = sx > CX ? 42 : -(130 + 42);
+      tooltip.style.left = (sx + side) + 'px';
+      tooltip.style.top  = (sy - 30) + 'px';
+      ttName.textContent = TECHS[i].name;
+      ttCat.textContent  = TECHS[i].cat;
+      ttTier.textContent = TECHS[i].tier.charAt(0).toUpperCase() + TECHS[i].tier.slice(1);
+      ttTier.className   = 'tt-tier tier-' + TECHS[i].tier;
+      tooltip.classList.add('show');
+    } else {
+      el.style.filter = blur > 0.1 ? `blur(${blur.toFixed(1)}px)` : 'none';
+    }
+  });
+}
+
+/* ── Pointer events ───────────────────────────────────── */
+globeEl.addEventListener('pointerdown', e => {
+  dragging = true;
+  ptrX = e.clientX; ptrY = e.clientY;
+  globeEl.setPointerCapture(e.pointerId);
+  e.preventDefault();
+});
+
+globeEl.addEventListener('pointermove', e => {
+  if (!dragging) return;
+  const dx = e.clientX - ptrX, dy = e.clientY - ptrY;
+  velY = dx * 0.0045; velX = dy * 0.0045;
+  rotY += velY; rotX += velX;
+  ptrX = e.clientX; ptrY = e.clientY;
+  lastInteract = performance.now();
+});
+
+globeEl.addEventListener('pointerup', () => {
+  dragging = false;
+  lastInteract = performance.now();
+});
+
+requestAnimationFrame(ts => { lastTs = ts; requestAnimationFrame(frame); });
+</script>
+</body>
+</html>

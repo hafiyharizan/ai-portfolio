@@ -118,7 +118,7 @@ export default function RootLayout({
         </Script>
         <Atmosphere />
         <Navbar />
-        <main className="relative z-[2]">{children}</main>
+        <main className="relative z-[2] pt-16">{children}</main>
         <Footer />
       </body>
     </html>

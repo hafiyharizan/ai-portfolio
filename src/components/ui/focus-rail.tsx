@@ -13,6 +13,7 @@ export type FocusRailItem = {
   imageSrc: string;
   href?: string;
   meta?: string;
+  tags?: readonly string[];
 };
 
 interface FocusRailProps {
@@ -113,7 +114,7 @@ export function FocusRail({
   return (
     <div
       className={cn(
-        "group relative flex h-[600px] w-full flex-col overflow-hidden bg-neutral-950 text-white outline-none select-none overflow-x-hidden",
+        "group relative flex h-[600px] w-full flex-col overflow-hidden text-white outline-none select-none overflow-x-hidden",
         className
       )}
       onMouseEnter={() => setIsHovering(true)}
@@ -122,27 +123,6 @@ export function FocusRail({
       onKeyDown={onKeyDown}
       onWheel={onWheel}
     >
-      {/* Background ambience */}
-      <div className="absolute inset-0 z-0 pointer-events-none">
-        <AnimatePresence mode="popLayout">
-          <motion.div
-            key={`bg-${activeItem.id}`}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 0.4 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
-            className="absolute inset-0"
-          >
-            <img
-              src={activeItem.imageSrc}
-              alt=""
-              className="h-full w-full object-cover blur-3xl saturate-200"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-neutral-950 via-neutral-950/50 to-transparent" />
-          </motion.div>
-        </AnimatePresence>
-      </div>
-
       {/* Main stage */}
       <div className="relative z-10 flex flex-1 flex-col justify-center px-4 md:px-8">
         <motion.div
@@ -199,6 +179,12 @@ export function FocusRail({
                 <img
                   src={item.imageSrc}
                   alt={item.title}
+                  onError={(e) => {
+                    const img = e.currentTarget;
+                    if (!img.src.includes("picsum")) {
+                      img.src = `https://picsum.photos/seed/${String(item.id).toLowerCase().replace(/\s+/g, "-")}/600/800`;
+                    }
+                  }}
                   className="h-full w-full rounded-2xl object-cover pointer-events-none"
                 />
                 <div className="absolute inset-0 rounded-2xl bg-gradient-to-b from-white/10 to-transparent pointer-events-none" />
@@ -232,6 +218,24 @@ export function FocusRail({
                   <p className="max-w-md text-neutral-400">
                     {activeItem.description}
                   </p>
+                )}
+                {activeItem.tags && activeItem.tags.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5 pt-1">
+                    {activeItem.tags.slice(0, 5).map((tag) => (
+                      <span
+                        key={tag}
+                        className="rounded-md border px-2 py-0.5 text-[11px]"
+                        style={{
+                          fontFamily: "var(--font-jb-mono)",
+                          color: "rgba(255,255,255,0.45)",
+                          borderColor: "rgba(255,255,255,0.12)",
+                          background: "rgba(255,255,255,0.06)",
+                        }}
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
                 )}
               </motion.div>
             </AnimatePresence>

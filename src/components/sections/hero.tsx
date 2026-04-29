@@ -6,14 +6,14 @@ import { SITE_CONFIG } from "@/lib/constants";
 import { AskAIModal } from "@/components/ask-ai-modal";
 import { useBreakpoint } from "@/hooks/use-breakpoint";
 
-const HEADLINE = ["Engineer", "shipping", "production", "AI-native", "systems", "from", "Perth."];
+const HEADLINE = ["Hi,", "I'm", "Hafiy"];
 const STACK = [
   "TypeScript","React","Next.js","Node.js","Python","PostgreSQL",
   "Redis","Docker","AWS","Azure AI","OpenAI","Tailwind",
   "tRPC","Prisma","GitHub Actions","Vercel","Supabase",
 ];
 
-type ModuleKey = "react" | "node" | "ai" | "sql" | "ts";
+type ModuleKey = "js" | "php" | "opencode" | "react" | "postgres";
 type Module = {
   key: ModuleKey;
   ico: string;
@@ -27,11 +27,11 @@ type Module = {
 };
 
 const MODULES: Module[] = [
-  { key: "react", ico: "R",  icoVariant: "accent", name: "react",      ver: "18.3",   desktopPos: { top: "-6%",  left: "-22%" },  mobilePos: { top: "-4%",  left: "-6%" },  delay: "-0.2s"  },
-  { key: "node",  ico: "N",  icoVariant: "green",  name: "node",       ver: "22.0",   desktopPos: { top: "18%",  right: "-26%" }, mobilePos: { top: "30%",  right: "-8%" }, delay: "-1.4s"  },
-  { key: "ai",    ico: "∴",  icoVariant: "blue",   name: "openai",     ver: "gpt-4o", desktopPos: { bottom: "24%", left: "-26%" }, mobilePos: { bottom: "22%", left: "-8%" }, delay: "-2.8s" },
-  { key: "sql",   ico: "P",  icoVariant: "accent", name: "postgres",   ver: "16",     desktopPos: { top: "-8%",  right: "-18%" }, mobilePos: {},              delay: "-4.0s", hideOnMedium: true },
-  { key: "ts",    ico: "T",  icoVariant: "blue",   name: "typescript", ver: "5.6",    desktopPos: { top: "42%",  left: "-30%" },  mobilePos: {},              delay: "-5.2s", hideOnMedium: true },
+  { key: "react",    ico: "R",  icoVariant: "accent", name: "react",      ver: "18.3",   desktopPos: { top: "-6%",    left: "-22%" },  mobilePos: { top: "-4%",    left: "-6%" },  delay: "-0.2s"  },
+  { key: "js",       ico: "JS", icoVariant: "green",  name: "javascript", ver: "ES2025", desktopPos: { top: "18%",    right: "-26%" }, mobilePos: { top: "30%",    right: "-8%" }, delay: "-1.4s"  },
+  { key: "opencode", ico: "◈",  icoVariant: "blue",   name: "opencode",   ver: "latest", desktopPos: { bottom: "24%", left: "-26%" },  mobilePos: { bottom: "22%", left: "-8%" },  delay: "-2.8s"  },
+  { key: "postgres", ico: "P",  icoVariant: "accent", name: "postgres",   ver: "16",     desktopPos: { top: "-8%",    right: "-18%" }, mobilePos: {},               delay: "-4.0s", hideOnMedium: true },
+  { key: "php",      ico: "P",  icoVariant: "blue",   name: "php",        ver: "8.3",    desktopPos: { top: "42%",    left: "-30%" },  mobilePos: {},               delay: "-5.2s", hideOnMedium: true },
 ];
 
 const icoStyle: Record<Module["icoVariant"], React.CSSProperties> = {
@@ -138,14 +138,14 @@ export function Hero() {
                 className="v2-word mr-[0.22em]"
                 style={{
                   animationDelay: `${0.15 + i * 0.06}s`,
-                  ...(word === "AI-native"
+                  ...(word === "AI-native" || word === "Hafiy"
                     ? {
                         background: "linear-gradient(110deg, var(--accent) 10%, var(--accent-hot) 50%, var(--accent) 90%)",
                         backgroundSize: "200% 100%",
                         WebkitBackgroundClip: "text",
                         WebkitTextFillColor: "transparent",
                         backgroundClip: "text",
-                        animation: `reveal-word 0.8s cubic-bezier(0.22,1,0.36,1) ${0.15 + 3 * 0.06}s forwards, sheen 6s linear ${0.15 + 3 * 0.06 + 0.8}s infinite`,
+                        animation: `reveal-word 0.8s cubic-bezier(0.22,1,0.36,1) ${0.15 + i * 0.06}s forwards, sheen 6s linear ${0.15 + i * 0.06 + 0.8}s infinite`,
                       }
                     : {}),
                 }}
@@ -351,14 +351,23 @@ export function Hero() {
                   boxShadow: "var(--portrait-shadow)",
                 }}
               >
-                <Image
-                  src="/avatar.png"
-                  alt="Portrait of Hafiy Harizan"
-                  fill
-                  className="object-cover object-top"
-                  style={{ filter: "saturate(1.02) contrast(1.04)" }}
-                  priority
+                {/* Static fallback — always rendered, video plays on top */}
+                <img
+                  src="/hero-avatar.png"
+                  alt="Hafiy Harizan"
+                  className="absolute inset-0 h-full w-full object-cover object-center"
+                  style={{ filter: "saturate(1.05) contrast(1.04)" }}
                 />
+                <video
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                  className="absolute inset-0 h-full w-full object-cover object-center"
+                  style={{ filter: "saturate(1.05) contrast(1.04)" }}
+                >
+                  <source src="/hero-avatar.mp4" type="video/mp4" />
+                </video>
                 <div
                   className="pointer-events-none absolute inset-0"
                   style={{ background: "var(--portrait-overlay)" }}

@@ -187,7 +187,7 @@ export function AskAIModal({ isOpen, onClose }: Props) {
             className="relative h-9 w-9 shrink-0 overflow-hidden rounded-lg"
             style={{ border: "1px solid var(--line-strong)" }}
           >
-            <Image src="/avatar.png" alt="" fill className="object-cover object-top" />
+            <Image src="/avatar.png" alt="" fill sizes="36px" className="object-cover object-top" />
             <span
               className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full"
               style={{ background: "var(--ok)", border: "2px solid var(--avatar-status-ring)" }}

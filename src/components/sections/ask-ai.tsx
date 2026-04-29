@@ -28,8 +28,10 @@ export function AskAI() {
   const [isStreaming, setIsStreaming] = useState(false);
   const abortRef = useRef<AbortController | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const isFirstRender = useRef(true);
 
   useEffect(() => {
+    if (isFirstRender.current) { isFirstRender.current = false; return; }
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
