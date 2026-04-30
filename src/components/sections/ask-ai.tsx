@@ -134,7 +134,8 @@ export function AskAI() {
         className="pointer-events-none absolute inset-0"
         aria-hidden="true"
         style={{
-          background: "radial-gradient(ellipse 80% 50% at 50% 50%, var(--accent-soft), transparent)",
+          background:
+            "radial-gradient(ellipse 80% 50% at 50% 50%, var(--accent-soft), transparent)",
         }}
       />
 
@@ -158,39 +159,135 @@ export function AskAI() {
         </motion.div>
 
         <motion.div
-          className="overflow-hidden rounded-2xl border border-border bg-card"
-          initial={{ opacity: 0, y: 20 }}
+          className="relative overflow-hidden rounded-2xl"
+          initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-80px" }}
           transition={{ duration: 0.5, delay: 0.15 }}
+          style={{
+            background: "var(--card)",
+            border: "1px solid var(--line-strong)",
+            boxShadow:
+              "0 0 60px var(--accent-soft), 0 8px 32px rgba(0,0,0,0.35)",
+          }}
         >
-          <div className="flex h-[360px] flex-col gap-4 overflow-y-auto p-6">
+          {/* Header */}
+          <div
+            className="flex items-center gap-3 border-b px-5 py-3.5"
+            style={{
+              borderColor: "var(--line-strong)",
+              background: "var(--bg-soft)",
+            }}
+          >
+            <motion.div
+              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg"
+              style={{
+                background:
+                  "linear-gradient(135deg, var(--accent), var(--accent-hot))",
+              }}
+              animate={{ scale: [1, 1.12, 1] }}
+              transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+              aria-hidden="true"
+            >
+              <Sparkles
+                className="h-4 w-4"
+                style={{ color: "var(--accent-ink)" }}
+              />
+            </motion.div>
+
+            <div className="flex-1">
+              <div className="flex items-center gap-2">
+                <span
+                  className="text-sm font-semibold"
+                  style={{ color: "var(--foreground)" }}
+                >
+                  Hafiy AI
+                </span>
+                <span
+                  className="rounded px-1.5 py-0.5 text-[9px]"
+                  style={{
+                    fontFamily: "var(--font-jb-mono)",
+                    background: "var(--accent-soft)",
+                    color: "var(--accent-light)",
+                    border: "1px solid var(--accent-line)",
+                    letterSpacing: "0.08em",
+                  }}
+                >
+                  TWIN
+                </span>
+              </div>
+              <div
+                className="mt-0.5 flex items-center gap-1.5"
+                style={{
+                  fontFamily: "var(--font-jb-mono)",
+                  fontSize: 10,
+                  color: "var(--muted-foreground)",
+                }}
+              >
+                <motion.span
+                  className="h-1.5 w-1.5 rounded-full"
+                  style={{ background: "var(--ok)" }}
+                  animate={{ opacity: [1, 0.4, 1] }}
+                  transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                />
+                online · digital twin
+              </div>
+            </div>
+          </div>
+
+          {/* Messages */}
+          <div
+            className="flex h-[300px] flex-col gap-3 overflow-y-auto p-5"
+            style={{
+              scrollbarWidth: "thin",
+              scrollbarColor: "var(--line-strong) transparent",
+            }}
+          >
             <AnimatePresence initial={false}>
               {messages.map((msg, i) => (
                 <motion.div
                   key={i}
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.25 }}
+                  initial={{ opacity: 0, y: 10, scale: 0.97 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
                   className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
                 >
                   <div
-                    className={`max-w-[80%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
+                    className="max-w-[80%] rounded-xl px-4 py-2.5 text-sm leading-relaxed"
+                    style={
                       msg.role === "user"
-                        ? "rounded-tr-none bg-accent"
-                        : "rounded-tl-none border border-border bg-background text-foreground"
-                    }`}
-                    style={msg.role === "user" ? { color: "var(--accent-ink)" } : undefined}
+                        ? {
+                            background:
+                              "linear-gradient(135deg, var(--accent), var(--accent-hot))",
+                            color: "var(--accent-ink)",
+                            borderBottomRightRadius: 4,
+                          }
+                        : {
+                            background: "var(--bg-soft)",
+                            border: "1px solid var(--line-strong)",
+                            color: "var(--foreground)",
+                            borderBottomLeftRadius: 4,
+                          }
+                    }
                   >
                     {msg.text || (isStreaming && i === messages.length - 1) ? (
                       msg.text || (
-                        <div className="flex items-center gap-1" role="status" aria-label="Thinking">
-                          {[0, 0.2, 0.4].map((delay, j) => (
+                        <div
+                          className="flex items-center gap-1 py-0.5"
+                          role="status"
+                          aria-label="Thinking"
+                        >
+                          {[0, 0.18, 0.36].map((delay, j) => (
                             <motion.span
                               key={j}
-                              className="h-1.5 w-1.5 rounded-full bg-muted-foreground"
-                              animate={{ opacity: [0.3, 1, 0.3] }}
-                              transition={{ duration: 1, repeat: Infinity, delay }}
+                              className="h-1.5 w-1.5 rounded-full"
+                              style={{ background: "var(--muted)" }}
+                              animate={{ opacity: [0.3, 1, 0.3], y: [0, -3, 0] }}
+                              transition={{
+                                duration: 1,
+                                repeat: Infinity,
+                                delay,
+                              }}
                             />
                           ))}
                         </div>
@@ -203,38 +300,87 @@ export function AskAI() {
             <div ref={messagesEndRef} />
           </div>
 
-          <div className="flex flex-wrap gap-2 border-t border-border px-6 py-4">
+          {/* Chips */}
+          <div
+            className="flex flex-wrap gap-1.5 border-t px-5 py-3"
+            style={{
+              borderColor: "var(--line-strong)",
+              background: "var(--bg-soft)",
+            }}
+          >
             {SUGGESTED_QUESTIONS.map((q) => (
               <button
                 key={q}
                 onClick={() => handleSubmit(q)}
                 disabled={isStreaming}
-                className="rounded-full border border-border bg-card px-3 py-1.5 text-xs text-muted transition-all duration-200 hover:border-accent-light hover:text-accent-light disabled:cursor-not-allowed disabled:opacity-50"
+                className="rounded-lg border px-3 py-1.5 text-[11px] transition-all duration-200 hover:-translate-y-px disabled:cursor-not-allowed disabled:opacity-40"
+                style={{
+                  fontFamily: "var(--font-jb-mono)",
+                  background: "var(--card)",
+                  borderColor: "var(--line-strong)",
+                  color: "var(--muted)",
+                }}
+                onMouseEnter={(e) => {
+                  const el = e.currentTarget as HTMLElement;
+                  el.style.borderColor = "var(--accent)";
+                  el.style.color = "var(--accent-light)";
+                  el.style.background = "var(--accent-soft)";
+                }}
+                onMouseLeave={(e) => {
+                  const el = e.currentTarget as HTMLElement;
+                  el.style.borderColor = "var(--line-strong)";
+                  el.style.color = "var(--muted)";
+                  el.style.background = "var(--card)";
+                }}
               >
                 {q}
               </button>
             ))}
           </div>
 
-          <div className="border-t border-border p-4">
-            <div className="flex items-center gap-3 rounded-xl border border-border bg-background px-4 py-2">
+          {/* Composer */}
+          <div
+            className="border-t p-4"
+            style={{ borderColor: "var(--line-strong)" }}
+          >
+            <div
+              className="flex items-center gap-3 rounded-xl border px-4 py-2.5 transition-all duration-200 focus-within:shadow-[0_0_0_3px_var(--accent-soft)]"
+              style={{
+                background: "var(--bg-soft)",
+                borderColor: "var(--line-strong)",
+              }}
+              onFocusCapture={(e) =>
+                (e.currentTarget.style.borderColor = "var(--accent)")
+              }
+              onBlurCapture={(e) =>
+                (e.currentTarget.style.borderColor = "var(--line-strong)")
+              }
+            >
               <motion.div
                 className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full"
-                style={{ background: "linear-gradient(135deg, var(--accent), var(--accent-hot))" }}
+                style={{
+                  background:
+                    "linear-gradient(135deg, var(--accent), var(--accent-hot))",
+                }}
                 animate={{ scale: [1, 1.15, 1] }}
                 transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
                 aria-hidden="true"
               >
-                <Sparkles className="h-3 w-3" style={{ color: "var(--accent-ink)" }} />
+                <Sparkles
+                  className="h-3 w-3"
+                  style={{ color: "var(--accent-ink)" }}
+                />
               </motion.div>
 
               <input
                 type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                onKeyDown={(e) => { if (e.key === "Enter") handleSubmit(); }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") handleSubmit();
+                }}
                 placeholder="Ask me anything about Hafiy..."
-                className="min-w-0 flex-1 bg-transparent py-1.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none"
+                className="min-w-0 flex-1 bg-transparent py-1 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none"
                 aria-label="Ask a question about Hafiy"
                 disabled={isStreaming}
               />
@@ -242,8 +388,12 @@ export function AskAI() {
               <button
                 onClick={() => handleSubmit()}
                 disabled={!input.trim() || isStreaming}
-                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-accent transition-all duration-200 hover:bg-accent-light disabled:cursor-not-allowed disabled:opacity-40"
-                style={{ color: "var(--accent-ink)" }}
+                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-40"
+                style={{
+                  background:
+                    "linear-gradient(135deg, var(--accent), var(--accent-hot))",
+                  color: "var(--accent-ink)",
+                }}
                 aria-label="Send question"
               >
                 {isStreaming ? (

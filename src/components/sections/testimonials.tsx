@@ -172,7 +172,6 @@ export function Testimonials() {
         )}
 
       </div>
-      <div className="section-divider mx-auto mt-24 max-w-4xl" />
     </section>
   );
 }
