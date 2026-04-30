@@ -1,21 +1,22 @@
 create extension if not exists pgcrypto;
 
 create table if not exists public.endorsements (
-  id uuid primary key default gen_random_uuid(),
-  user_id uuid not null unique references auth.users(id) on delete cascade,
-  provider text not null,
-  name text not null,
-  avatar_url text,
-  message text not null check (char_length(message) <= 240),
-  role text,
+  id          uuid        primary key default gen_random_uuid(),
+  user_id     uuid        references auth.users(id) on delete cascade,
+  provider    text        not null default 'guest',
+  name        text        not null,
+  avatar_url  text,
+  message     text        not null check (char_length(message) <= 240),
+  role        text,
   linkedin_url text,
-  tags text[] not null default '{}',
-  country text,
-  status text not null default 'pending' check (status in ('pending', 'approved', 'rejected')),
-  approved boolean not null default false,
-  featured boolean not null default false,
-  created_at timestamptz not null default timezone('utc', now()),
-  updated_at timestamptz not null default timezone('utc', now())
+  tags        text[]      not null default '{}',
+  country     text,
+  ip_hash     text,
+  status      text        not null default 'pending' check (status in ('pending', 'approved', 'rejected')),
+  approved    boolean     not null default false,
+  featured    boolean     not null default false,
+  created_at  timestamptz not null default timezone('utc', now()),
+  updated_at  timestamptz not null default timezone('utc', now())
 );
 
 create index if not exists endorsements_approved_idx
@@ -50,29 +51,4 @@ drop policy if exists "Public can read approved endorsements" on public.endorsem
 create policy "Public can read approved endorsements"
 on public.endorsements
 for select
-using (approved = true or auth.uid() = user_id);
-
-drop policy if exists "Users can insert own pending endorsement" on public.endorsements;
-create policy "Users can insert own pending endorsement"
-on public.endorsements
-for insert
-to authenticated
-with check (
-  auth.uid() = user_id
-  and approved = false
-  and featured = false
-  and status = 'pending'
-);
-
-drop policy if exists "Users can update own pending endorsement" on public.endorsements;
-create policy "Users can update own pending endorsement"
-on public.endorsements
-for update
-to authenticated
-using (auth.uid() = user_id)
-with check (
-  auth.uid() = user_id
-  and approved = false
-  and featured = false
-  and status = 'pending'
-);
+using (approved = true);

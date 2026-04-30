@@ -76,6 +76,17 @@ export const PERSONAL_PROJECTS = [
     href: "https://tailor-swift-eight.vercel.app/",
     featured: true,
   },
+  {
+    name: "Surau Elmina Valley",
+    tagline: "Community Mosque Portal",
+    description:
+      "A community web portal for Surau Elmina Valley — featuring announcements, bulletins, gallery, and an AI-powered guide avatar. Built to keep the local surau community informed and connected.",
+    tags: ["Next.js", "TypeScript", "Tailwind CSS", "Supabase"],
+    icon: "building-2",
+    color: "#0d9488",
+    href: "https://www.surauelminavalley.com/",
+    featured: true,
+  },
 ] as const;
 
 export const PROFESSIONAL_PROJECTS = [

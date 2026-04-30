@@ -171,11 +171,15 @@ export function Hero() {
             className="v2-up mt-5 leading-[1.55]"
             style={{ fontSize: isSmall ? 15 : 17, color: "var(--muted)", animationDelay: "0.75s", maxWidth: 540 }}
           >
-            I build the whole stack — from{" "}
-            <strong style={{ color: "var(--foreground)", fontWeight: 500 }}>
-              data pipelines moving millions of records
-            </strong>{" "}
-            to the UI a customer touches. Now using AI as leverage to ship features small teams used to need ten engineers for.
+            I build across the{" "}
+            <span style={{ color: "var(--foreground)", fontWeight: 500 }}>full stack</span>
+            {" "}— from data pipelines and backend systems to the front-end users see.
+            <br />
+            <span style={{ fontSize: isSmall ? 13 : 15, color: "var(--muted-foreground)", marginTop: 4, display: "inline-block" }}>
+              4+ years shipping production-grade work, now using{" "}
+              <span style={{ color: "var(--accent)" }}>AI</span>
+              {" "}to move faster and cover more ground.
+            </span>
           </p>
 
           {/* Metrics strip */}
