@@ -37,8 +37,8 @@ function BentoCard({
       onMouseLeave={() => setLit(false)}
       className={cn("relative overflow-hidden rounded-2xl", cellClass, className)}
       style={{
-        background: "rgba(255,255,255,0.03)",
-        border: "1px solid rgba(255,255,255,0.07)",
+        background: "var(--bento-card-bg)",
+        border: "1px solid var(--bento-card-border)",
         backdropFilter: "blur(20px)",
         WebkitBackdropFilter: "blur(20px)",
       }}
@@ -48,7 +48,7 @@ function BentoCard({
         className="pointer-events-none absolute inset-x-0 top-0 h-px"
         style={{
           background:
-            "linear-gradient(90deg, transparent, rgba(255,255,255,0.10), transparent)",
+            "linear-gradient(90deg, transparent, var(--bento-edge), transparent)",
         }}
       />
       {/* Spotlight */}
@@ -57,7 +57,7 @@ function BentoCard({
         style={{
           opacity: lit ? 1 : 0,
           background:
-            "radial-gradient(380px circle at var(--mx,50%) var(--my,50%), rgba(255,255,255,0.055), transparent 65%)",
+            "radial-gradient(380px circle at var(--mx,50%) var(--my,50%), var(--bento-spotlight), transparent 65%)",
         }}
       />
       {children}
@@ -120,7 +120,7 @@ function PerthClock() {
           </span>
           <span
             className="text-4xl font-bold"
-            style={{ color: "rgba(255,255,255,0.25)" }}
+            style={{ color: "var(--muted)" }}
           >
             :
           </span>
@@ -129,7 +129,7 @@ function PerthClock() {
           </span>
           <span
             className="text-4xl font-bold"
-            style={{ color: "rgba(255,255,255,0.25)" }}
+            style={{ color: "var(--muted)" }}
           >
             :
           </span>
@@ -245,7 +245,7 @@ function InterestItem({
       onClick={() => setOpen((o) => !o)}
       whileHover={{ scale: 1.015 }}
       whileTap={{ scale: 0.985 }}
-      className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left transition-colors hover:bg-white/[0.035] focus:outline-none"
+      className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left transition-colors hover:bg-[var(--subtle-fill)] focus:outline-none"
     >
       <div
         className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg"
@@ -300,7 +300,7 @@ export function About() {
               alt="Hafiy Harizan"
               fill
               className="object-cover object-top"
-              sizes="(max-width: 639px) 100vw, (max-width: 1023px) 50vw, 66vw"
+              sizes="(max-width: 639px) 100vw, (max-width: 1023px) 50vw, 33vw"
               priority
             />
             {/* Name overlay */}

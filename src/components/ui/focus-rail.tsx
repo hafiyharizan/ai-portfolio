@@ -114,7 +114,7 @@ export function FocusRail({
   return (
     <div
       className={cn(
-        "group relative flex h-[600px] w-full flex-col overflow-hidden text-white outline-none select-none overflow-x-hidden",
+        "group relative flex h-[540px] w-full flex-col overflow-hidden outline-none select-none overflow-x-hidden",
         className
       )}
       onMouseEnter={() => setIsHovering(true)}
@@ -126,7 +126,7 @@ export function FocusRail({
       {/* Main stage */}
       <div className="relative z-10 flex flex-1 flex-col justify-center px-4 md:px-8">
         <motion.div
-          className="relative mx-auto flex h-[360px] w-full max-w-6xl items-center justify-center cursor-grab active:cursor-grabbing"
+          className="relative mx-auto flex h-[300px] w-full max-w-6xl items-center justify-center cursor-grab active:cursor-grabbing"
           style={{ perspective: 1200 }}
           drag="x"
           dragConstraints={{ left: 0, right: 0 }}
@@ -143,7 +143,7 @@ export function FocusRail({
             const isCenter = offset === 0;
             const dist = Math.abs(offset);
 
-            const xOffset = offset * 320;
+            const xOffset = offset * 380;
             const zOffset = -dist * 180;
             const scale = isCenter ? 1 : 0.85;
             const rotateY = offset * -20;
@@ -155,8 +155,8 @@ export function FocusRail({
               <motion.div
                 key={absIndex}
                 className={cn(
-                  "absolute aspect-[3/4] w-[260px] md:w-[300px] rounded-2xl border-t border-white/20 bg-neutral-900 shadow-2xl",
-                  isCenter ? "z-20 shadow-white/10" : "z-10"
+                  "absolute flex flex-col overflow-hidden aspect-[16/10] w-[300px] md:w-[420px] rounded-2xl bg-neutral-900 shadow-2xl",
+                  isCenter ? "z-20 ring-1 ring-white/10" : "z-10"
                 )}
                 initial={false}
                 animate={{
@@ -176,19 +176,28 @@ export function FocusRail({
                   if (offset !== 0) setActive((p) => p + offset);
                 }}
               >
-                <img
-                  src={item.imageSrc}
-                  alt={item.title}
-                  onError={(e) => {
-                    const img = e.currentTarget;
-                    if (!img.src.includes("picsum")) {
-                      img.src = `https://picsum.photos/seed/${String(item.id).toLowerCase().replace(/\s+/g, "-")}/600/800`;
-                    }
-                  }}
-                  className="h-full w-full rounded-2xl object-cover pointer-events-none"
-                />
-                <div className="absolute inset-0 rounded-2xl bg-gradient-to-b from-white/10 to-transparent pointer-events-none" />
-                <div className="absolute inset-0 rounded-2xl bg-black/10 pointer-events-none mix-blend-multiply" />
+                {/* Browser chrome header */}
+                <div className="flex h-7 shrink-0 items-center gap-1.5 border-b border-white/[0.07] bg-neutral-950/60 px-3">
+                  <div className="h-2.5 w-2.5 rounded-full bg-red-500/70" />
+                  <div className="h-2.5 w-2.5 rounded-full bg-yellow-500/70" />
+                  <div className="h-2.5 w-2.5 rounded-full bg-green-500/70" />
+                  <div className="ml-2 h-3.5 flex-1 rounded-sm bg-white/[0.07]" />
+                </div>
+                {/* Screenshot */}
+                <div className="relative flex-1 overflow-hidden">
+                  <img
+                    src={item.imageSrc}
+                    alt={item.title}
+                    onError={(e) => {
+                      const img = e.currentTarget;
+                      if (!img.src.includes("picsum")) {
+                        img.src = `https://picsum.photos/seed/${String(item.id).toLowerCase().replace(/\s+/g, "-")}/1600/1000`;
+                      }
+                    }}
+                    className="h-full w-full object-cover object-top pointer-events-none"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent pointer-events-none" />
+                </div>
               </motion.div>
             );
           })}
@@ -196,7 +205,7 @@ export function FocusRail({
 
         {/* Info & controls */}
         <div className="mx-auto mt-12 flex w-full max-w-4xl flex-col items-center justify-between gap-6 md:flex-row pointer-events-auto">
-          <div className="flex flex-1 flex-col items-center text-center md:items-start md:text-left h-32 justify-center">
+          <div className="flex flex-1 flex-col items-center text-center md:items-start md:text-left min-h-[96px] justify-center">
             <AnimatePresence mode="wait">
               <motion.div
                 key={activeItem.id}
@@ -207,15 +216,15 @@ export function FocusRail({
                 className="space-y-2"
               >
                 {activeItem.meta && (
-                  <span className="text-xs font-medium uppercase tracking-wider text-emerald-400">
+                  <span className="text-xs font-medium uppercase tracking-wider" style={{ color: "var(--accent-light)" }}>
                     {activeItem.meta}
                   </span>
                 )}
-                <h2 className="text-3xl font-bold tracking-tight md:text-4xl text-white">
+                <h2 className="text-3xl font-bold tracking-tight md:text-4xl" style={{ color: "var(--foreground)" }}>
                   {activeItem.title}
                 </h2>
                 {activeItem.description && (
-                  <p className="max-w-md text-neutral-400">
+                  <p className="max-w-md" style={{ color: "var(--muted)" }}>
                     {activeItem.description}
                   </p>
                 )}
@@ -227,9 +236,9 @@ export function FocusRail({
                         className="rounded-md border px-2 py-0.5 text-[11px]"
                         style={{
                           fontFamily: "var(--font-jb-mono)",
-                          color: "rgba(255,255,255,0.45)",
-                          borderColor: "rgba(255,255,255,0.12)",
-                          background: "rgba(255,255,255,0.06)",
+                          color: "var(--muted)",
+                          borderColor: "var(--line-strong)",
+                          background: "var(--bg-soft)",
                         }}
                       >
                         {tag}
@@ -242,20 +251,32 @@ export function FocusRail({
           </div>
 
           <div className="flex items-center gap-4">
-            <div className="flex items-center gap-1 rounded-full bg-neutral-900/80 p-1 ring-1 ring-white/10 backdrop-blur-md">
+            <div
+              className="flex items-center gap-1 rounded-full p-1"
+              style={{ background: "var(--card)", border: "1px solid var(--line-strong)" }}
+            >
               <button
                 onClick={handlePrev}
-                className="rounded-full p-3 text-neutral-400 transition hover:bg-white/10 hover:text-white active:scale-95"
+                className="rounded-full p-3 transition active:scale-95"
+                style={{ color: "var(--muted)" }}
+                onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = "var(--bg-soft)"; (e.currentTarget as HTMLElement).style.color = "var(--foreground)"; }}
+                onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = ""; (e.currentTarget as HTMLElement).style.color = "var(--muted)"; }}
                 aria-label="Previous"
               >
                 <ChevronLeft className="h-5 w-5" />
               </button>
-              <span className="min-w-[40px] text-center text-xs font-mono text-neutral-500">
+              <span
+                className="min-w-[40px] text-center text-xs"
+                style={{ fontFamily: "var(--font-jb-mono)", color: "var(--muted-foreground)" }}
+              >
                 {activeIndex + 1} / {count}
               </span>
               <button
                 onClick={handleNext}
-                className="rounded-full p-3 text-neutral-400 transition hover:bg-white/10 hover:text-white active:scale-95"
+                className="rounded-full p-3 transition active:scale-95"
+                style={{ color: "var(--muted)" }}
+                onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = "var(--bg-soft)"; (e.currentTarget as HTMLElement).style.color = "var(--foreground)"; }}
+                onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = ""; (e.currentTarget as HTMLElement).style.color = "var(--muted)"; }}
                 aria-label="Next"
               >
                 <ChevronRight className="h-5 w-5" />
@@ -267,7 +288,8 @@ export function FocusRail({
                 href={activeItem.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group flex items-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-semibold text-black transition-transform hover:scale-105 active:scale-95"
+                className="group flex items-center gap-2 rounded-full px-5 py-3 text-sm font-semibold transition-transform hover:scale-105 active:scale-95"
+                style={{ background: "var(--foreground)", color: "var(--background)" }}
               >
                 Explore
                 <ArrowUpRight className="h-4 w-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />

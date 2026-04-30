@@ -1,7 +1,7 @@
 export const THEME_STORAGE_KEY = "hafiy-theme";
 export const APPEARANCE_STORAGE_KEY = "hafiy-appearance";
 export const DEFAULT_THEME = "forest-green" as const;
-export const DEFAULT_APPEARANCE_MODE = "auto" as const;
+export const DEFAULT_APPEARANCE_MODE = "dark" as const;
 
 export const THEMES = [
   { name: "forest-green",    label: "Ember",  accent: "#d97b42", accentHot: "#e8963a", hue: 31  },

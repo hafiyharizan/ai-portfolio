@@ -132,9 +132,12 @@ export function Navbar() {
               {label}
             </a>
           ))}
+          <div className="mt-4 pt-1 pb-2">
+            <ThemePicker />
+          </div>
           <a
             href={`mailto:${SITE_CONFIG.email}`}
-            className="mt-4 inline-flex items-center gap-2 rounded-lg border px-3 py-2 text-sm"
+            className="mt-2 inline-flex items-center gap-2 rounded-lg border px-3 py-2 text-sm"
             style={{ borderColor: "var(--line-strong)", background: "var(--bg-soft)", color: "var(--muted)", fontFamily: "var(--font-jb-mono)", fontSize: 12 }}
           >
             <span className="h-1.5 w-1.5 rounded-full" style={{ background: "var(--ok)", boxShadow: "0 0 8px var(--ok)" }} />
