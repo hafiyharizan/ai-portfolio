@@ -11,6 +11,7 @@ import {
   DEFAULT_THEME,
   THEME_NAMES,
   THEME_STORAGE_KEY,
+  type AppearanceMode,
 } from "@/lib/theme";
 import "./globals.css";
 
@@ -110,7 +111,7 @@ export default function RootLayout({
       className={`${geistSans.variable} ${jbMono.variable}`}
       data-theme={DEFAULT_THEME}
       data-appearance-mode={DEFAULT_APPEARANCE_MODE}
-      data-appearance={DEFAULT_APPEARANCE_MODE === "auto" ? undefined : DEFAULT_APPEARANCE_MODE}
+      data-appearance={(DEFAULT_APPEARANCE_MODE as AppearanceMode) === "auto" ? undefined : DEFAULT_APPEARANCE_MODE}
       suppressHydrationWarning
     >
       <body className="grain min-h-screen bg-background text-foreground antialiased">
