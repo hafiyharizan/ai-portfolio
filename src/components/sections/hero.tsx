@@ -194,10 +194,9 @@ export function Hero() {
                 style={{
                   borderLeft: !isSmall && i > 0 ? "1px solid var(--line)" : "none",
                   borderTop: isSmall && i > 0 ? "1px solid var(--line)" : "none",
-                  paddingLeft: !isSmall && i === 0 ? 0 : undefined,
+                  paddingLeft: (!isSmall && i > 0) ? undefined : 0,
                   paddingTop: isSmall && i > 0 ? 12 : undefined,
                   paddingBottom: isSmall && i < 2 ? 12 : undefined,
-                  ...(isSmall && i === 0 ? { paddingLeft: 0 } : {}),
                 }}
               >
                 <div

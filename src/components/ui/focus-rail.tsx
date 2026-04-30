@@ -114,7 +114,7 @@ export function FocusRail({
   return (
     <div
       className={cn(
-        "group relative flex h-[540px] w-full flex-col overflow-hidden text-white outline-none select-none overflow-x-hidden",
+        "group relative flex h-[540px] w-full flex-col overflow-hidden outline-none select-none overflow-x-hidden",
         className
       )}
       onMouseEnter={() => setIsHovering(true)}
@@ -216,15 +216,15 @@ export function FocusRail({
                 className="space-y-2"
               >
                 {activeItem.meta && (
-                  <span className="text-xs font-medium uppercase tracking-wider text-emerald-400">
+                  <span className="text-xs font-medium uppercase tracking-wider" style={{ color: "var(--accent-light)" }}>
                     {activeItem.meta}
                   </span>
                 )}
-                <h2 className="text-3xl font-bold tracking-tight md:text-4xl text-white">
+                <h2 className="text-3xl font-bold tracking-tight md:text-4xl" style={{ color: "var(--foreground)" }}>
                   {activeItem.title}
                 </h2>
                 {activeItem.description && (
-                  <p className="max-w-md text-neutral-400">
+                  <p className="max-w-md" style={{ color: "var(--muted)" }}>
                     {activeItem.description}
                   </p>
                 )}
@@ -236,9 +236,9 @@ export function FocusRail({
                         className="rounded-md border px-2 py-0.5 text-[11px]"
                         style={{
                           fontFamily: "var(--font-jb-mono)",
-                          color: "rgba(255,255,255,0.45)",
-                          borderColor: "rgba(255,255,255,0.12)",
-                          background: "rgba(255,255,255,0.06)",
+                          color: "var(--muted)",
+                          borderColor: "var(--line-strong)",
+                          background: "var(--bg-soft)",
                         }}
                       >
                         {tag}
@@ -251,20 +251,32 @@ export function FocusRail({
           </div>
 
           <div className="flex items-center gap-4">
-            <div className="flex items-center gap-1 rounded-full bg-neutral-900/80 p-1 ring-1 ring-white/10 backdrop-blur-md">
+            <div
+              className="flex items-center gap-1 rounded-full p-1"
+              style={{ background: "var(--card)", border: "1px solid var(--line-strong)" }}
+            >
               <button
                 onClick={handlePrev}
-                className="rounded-full p-3 text-neutral-400 transition hover:bg-white/10 hover:text-white active:scale-95"
+                className="rounded-full p-3 transition active:scale-95"
+                style={{ color: "var(--muted)" }}
+                onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = "var(--bg-soft)"; (e.currentTarget as HTMLElement).style.color = "var(--foreground)"; }}
+                onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = ""; (e.currentTarget as HTMLElement).style.color = "var(--muted)"; }}
                 aria-label="Previous"
               >
                 <ChevronLeft className="h-5 w-5" />
               </button>
-              <span className="min-w-[40px] text-center text-xs font-mono text-neutral-500">
+              <span
+                className="min-w-[40px] text-center text-xs"
+                style={{ fontFamily: "var(--font-jb-mono)", color: "var(--muted-foreground)" }}
+              >
                 {activeIndex + 1} / {count}
               </span>
               <button
                 onClick={handleNext}
-                className="rounded-full p-3 text-neutral-400 transition hover:bg-white/10 hover:text-white active:scale-95"
+                className="rounded-full p-3 transition active:scale-95"
+                style={{ color: "var(--muted)" }}
+                onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = "var(--bg-soft)"; (e.currentTarget as HTMLElement).style.color = "var(--foreground)"; }}
+                onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = ""; (e.currentTarget as HTMLElement).style.color = "var(--muted)"; }}
                 aria-label="Next"
               >
                 <ChevronRight className="h-5 w-5" />
@@ -276,7 +288,8 @@ export function FocusRail({
                 href={activeItem.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group flex items-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-semibold text-black transition-transform hover:scale-105 active:scale-95"
+                className="group flex items-center gap-2 rounded-full px-5 py-3 text-sm font-semibold transition-transform hover:scale-105 active:scale-95"
+                style={{ background: "var(--foreground)", color: "var(--background)" }}
               >
                 Explore
                 <ArrowUpRight className="h-4 w-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
