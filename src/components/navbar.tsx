@@ -133,7 +133,7 @@ export function Navbar() {
             </a>
           ))}
           <div className="mt-4 pt-1 pb-2">
-            <ThemePicker />
+            <ThemePicker mode="mobile" />
           </div>
           <a
             href={`mailto:${SITE_CONFIG.email}`}
