@@ -10,6 +10,7 @@ import { PERSONAL_PROJECTS, PROFESSIONAL_PROJECTS } from "@/lib/constants";
 const HIDDEN_PROJECTS = ["FishScout", "NDM"];
 
 const LOCAL_IMAGES: Record<string, string> = {
+  "Nayla":         "/projects/nayla.jpg",
   "ChoreQuest":    "/projects/chorequest.png",
   "FridgeBoard":   "/projects/fridgeboard.png",
   "Salasilah":     "/projects/salasilah.png",
@@ -41,6 +42,7 @@ const RAIL_ITEMS: FocusRailItem[] = [
     meta: "Personal • " + p.tags[0],
     imageSrc: imgSrc(p.name),
     href: p.href,
+    repoHref: "repo" in p ? p.repo : undefined,
     tags: p.tags,
   })),
 ];
@@ -53,6 +55,7 @@ type GridItem = {
   tags: readonly string[];
   type: "Personal" | "Professional";
   href?: string;
+  repoHref?: string;
   imageSrc: string;
 };
 
@@ -74,6 +77,7 @@ const GRID_ITEMS: GridItem[] = [
     tags: p.tags,
     type: "Personal" as const,
     href: p.href,
+    repoHref: "repo" in p ? p.repo : undefined,
     imageSrc: imgSrc(p.name),
   })),
 ];
@@ -159,17 +163,33 @@ function ProjectCard({ item }: { item: GridItem }) {
           ))}
         </div>
 
-        {item.href && (
-          <a
-            href={item.href}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-1 inline-flex items-center gap-1 text-xs font-medium transition-colors duration-150"
-            style={{ color: "var(--accent)", fontFamily: "var(--font-jb-mono)" }}
-          >
-            View project
-            <ArrowUpRight className="h-3 w-3" />
-          </a>
+        {(item.href || item.repoHref) && (
+          <div className="mt-1 flex items-center gap-4">
+            {item.href && (
+              <a
+                href={item.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 text-xs font-medium transition-colors duration-150"
+                style={{ color: "var(--accent)", fontFamily: "var(--font-jb-mono)" }}
+              >
+                View project
+                <ArrowUpRight className="h-3 w-3" />
+              </a>
+            )}
+            {item.repoHref && (
+              <a
+                href={item.repoHref}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 text-xs font-medium transition-colors duration-150"
+                style={{ color: "var(--muted)", fontFamily: "var(--font-jb-mono)" }}
+              >
+                Source
+                <ArrowUpRight className="h-3 w-3" />
+              </a>
+            )}
+          </div>
         )}
       </div>
     </div>

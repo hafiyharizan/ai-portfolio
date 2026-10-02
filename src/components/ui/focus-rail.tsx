@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { motion, AnimatePresence, type PanInfo } from "framer-motion";
-import { ChevronLeft, ChevronRight, ArrowUpRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, ArrowUpRight, CodeXml } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 
@@ -12,6 +12,7 @@ export type FocusRailItem = {
   description?: string;
   imageSrc: string;
   href?: string;
+  repoHref?: string;
   meta?: string;
   tags?: readonly string[];
 };
@@ -250,7 +251,7 @@ export function FocusRail({
             </AnimatePresence>
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4">
             <div
               className="flex items-center gap-1 rounded-full p-1"
               style={{ background: "var(--card)", border: "1px solid var(--line-strong)" }}
@@ -266,7 +267,7 @@ export function FocusRail({
                 <ChevronLeft className="h-5 w-5" />
               </button>
               <span
-                className="min-w-[40px] text-center text-xs"
+                className="min-w-[40px] whitespace-nowrap text-center text-xs"
                 style={{ fontFamily: "var(--font-jb-mono)", color: "var(--muted-foreground)" }}
               >
                 {activeIndex + 1} / {count}
@@ -293,6 +294,19 @@ export function FocusRail({
               >
                 Explore
                 <ArrowUpRight className="h-4 w-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+              </Link>
+            )}
+            {activeItem.repoHref && (
+              <Link
+                href={activeItem.repoHref}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={`${activeItem.title} source code on GitHub`}
+                className="flex items-center gap-2 rounded-full border px-4 py-3 text-sm font-semibold transition-transform hover:scale-105 active:scale-95 sm:px-5"
+                style={{ borderColor: "var(--line-strong)", color: "var(--foreground)", background: "var(--card)" }}
+              >
+                <CodeXml className="h-4 w-4" />
+                <span className="hidden sm:inline">Code</span>
               </Link>
             )}
           </div>

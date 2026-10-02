@@ -22,6 +22,18 @@ export const NAV_LINKS = [
 
 export const PERSONAL_PROJECTS = [
   {
+    name: "Nayla",
+    tagline: "Offline-first Baby Tracker PWA",
+    description:
+      "A phone-first app for logging feeds, diapers, sleep and wake windows, built for one-handed use at 3am. Vanilla JavaScript with no build step: localStorage is the source of truth, and an optional Postgres/PostgREST backend syncs any number of phones paired by QR code, using server-assigned revisions, tombstone deletes and per-entry merging. Self-hostable with Docker Compose and Caddy, covered by Playwright browser tests, with a Python tool that imports old WhatsApp logs.",
+    tags: ["JavaScript", "PWA", "PostgreSQL", "PostgREST", "Docker", "Playwright"],
+    icon: "baby",
+    color: "#b4683c",
+    href: "https://hafiyharizan.github.io/Nayla/",
+    repo: "https://github.com/hafiyharizan/Nayla",
+    featured: true,
+  },
+  {
     name: "Salasilah",
     tagline: "Family Tree & Genealogy App",
     description:

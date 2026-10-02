@@ -91,7 +91,7 @@ export const CATEGORIES: Record<string, CategoryConfig> = {
   },
   projects: {
     response:
-      "Professionally, Hafiy's projects include HRPlus Operations (an Oracle-to-Power BI pipeline for HR service SLAs at WA Health), NurseWest business continuity automation in Python (WA Health), and at Telekom Malaysia: DREAM (a data platform with a FastAPI service layer that cut data retrieval from hours to minutes), NDM (a batch ETL data mart processing millions of records a day), MSQoS (a regulatory reporting pipeline with 100% on-time submissions) and FIVE (a spatial data pipeline for fibre route planning). On the side he has built Salasilah (a family tree app), ChoreQuest (a gamified chore app), FridgeBoard, ApplySmart AI and the Surau Elmina Valley community portal.",
+      "Professionally, Hafiy's projects include HRPlus Operations (an Oracle-to-Power BI pipeline for HR service SLAs at WA Health), NurseWest business continuity automation in Python (WA Health), and at Telekom Malaysia: DREAM (a data platform with a FastAPI service layer that cut data retrieval from hours to minutes), NDM (a batch ETL data mart processing millions of records a day), MSQoS (a regulatory reporting pipeline with 100% on-time submissions) and FIVE (a spatial data pipeline for fibre route planning). On the side he has built Nayla (an offline-first baby tracker PWA with Postgres/PostgREST sync between phones, Docker self-hosting and Playwright tests), Salasilah (a family tree app), ChoreQuest (a gamified chore app), FridgeBoard, ApplySmart AI and the Surau Elmina Valley community portal.",
     phrases: [
       { text: "personal projects", weight: 4 },
       { text: "what has hafiy built", weight: 4 },
@@ -105,6 +105,7 @@ export const CATEGORIES: Record<string, CategoryConfig> = {
       { text: "built", weight: 1.5 },
       { text: "dream", weight: 3 },
       { text: "salasilah", weight: 3 },
+      { text: "nayla", weight: 3 },
       { text: "chorequest", weight: 3 },
       { text: "fridgeboard", weight: 3 },
       { text: "applysmart", weight: 3 },
