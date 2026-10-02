@@ -37,6 +37,17 @@ describe("routeQuestion", () => {
     expect(result.category).toBe("experience");
   });
 
+  it("current employer question routes to canned experience mentioning WA Health", () => {
+    const result = routeQuestion("Where does he work now?");
+    expect(result.source).toBe("canned");
+    expect(result.category).toBe("experience");
+    expect(result.response).toContain("WA Health");
+  });
+
+  it("unlisted technology question goes to ai, not a canned answer", () => {
+    expect(routeQuestion("Does Hafiy have Kubernetes experience?").source).toBe("ai");
+  });
+
   it("contact question routes to canned", () => {
     const result = routeQuestion("how to contact Hafiy");
     expect(result.source).toBe("canned");

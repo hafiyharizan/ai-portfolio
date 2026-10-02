@@ -1,8 +1,8 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { GraduationCap } from "lucide-react";
-import { EDUCATION } from "@/lib/constants";
+import { Award, GraduationCap } from "lucide-react";
+import { CERTIFICATIONS, EDUCATION } from "@/lib/constants";
 import { SectionHeading } from "@/components/ui/section-heading";
 
 const containerVariants = {
@@ -28,7 +28,7 @@ export function Education() {
   return (
     <section id="education" className="py-24 px-4 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-4xl">
-        <SectionHeading label="Education" title="Academic background" />
+        <SectionHeading label="Education" title="Education & certification" />
 
         <motion.div
           variants={containerVariants}
@@ -53,6 +53,25 @@ export function Education() {
               <p className="mt-1 text-sm text-muted">{entry.school}</p>
               <p className="mt-0.5 text-xs text-muted-foreground">
                 {entry.period}
+              </p>
+            </motion.div>
+          ))}
+          {CERTIFICATIONS.map((cert) => (
+            <motion.div
+              key={cert.name}
+              variants={cardVariants}
+              className="rounded-xl border border-border bg-card p-6 transition-colors hover:bg-card-hover sm:col-span-2"
+            >
+              <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-lg bg-accent/10">
+                <Award className="h-5 w-5 text-accent-light" />
+              </div>
+
+              <h3 className="text-lg font-bold text-foreground">
+                {cert.name}
+              </h3>
+              <p className="mt-1 text-sm text-muted">{cert.issuer}</p>
+              <p className="mt-0.5 text-xs text-muted-foreground">
+                {cert.period}
               </p>
             </motion.div>
           ))}

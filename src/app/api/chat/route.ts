@@ -6,6 +6,8 @@ import {
   PERSONAL_PROJECTS,
   PROFESSIONAL_PROJECTS,
   EXPERIENCE,
+  EDUCATION,
+  CERTIFICATIONS,
 } from "@/lib/constants";
 
 const client = new OpenAI({
@@ -17,7 +19,11 @@ const MODEL = process.env.GEMINI_MODEL ?? "gemini-2.0-flash-preview-exp";
 
 const SYSTEM_PROMPT = `You are an assistant answering questions about Hafiy Harizan, a software and data engineer based in Perth, Australia.
 Do not claim to be Hafiy. Refer to him in the third person.
-If something is not in the provided context, say so briefly — do not invent details.
+Only state facts that appear in the context below. If a technology, employer, project or number is not listed, say it isn't listed in his experience — never guess or imply experience he hasn't listed.
+For example, if asked about a tool that isn't in the Skills or Experience sections (such as Kubernetes), say it isn't part of his listed experience.
+
+## Current role
+${EXPERIENCE[0].title} at ${EXPERIENCE[0].company} (${EXPERIENCE[0].period}).
 
 ## About Hafiy
 ${SITE_CONFIG.description}
@@ -40,7 +46,13 @@ ${PROFESSIONAL_PROJECTS.map(
 ## Experience
 ${EXPERIENCE.map(
   (e) => `- ${e.title} at ${e.company} (${e.period}): ${e.description.join(" ")}`
-).join("\n")}`;
+).join("\n")}
+
+## Education
+${EDUCATION.map((e) => `- ${e.degree}, ${e.school} (${e.period})`).join("\n")}
+
+## Certifications
+${CERTIFICATIONS.map((c) => `- ${c.name} (${c.period})`).join("\n")}`;
 
 type HistoryMessage = { role: "user" | "assistant"; content: string };
 

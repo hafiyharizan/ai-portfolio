@@ -8,9 +8,9 @@ import { useBreakpoint } from "@/hooks/use-breakpoint";
 
 const HEADLINE = ["Hi,", "I'm", "Hafiy"];
 const STACK = [
-  "TypeScript","React","Next.js","Node.js","Python","PostgreSQL",
-  "Redis","Docker","AWS","Azure AI","OpenAI","Tailwind",
-  "tRPC","Prisma","GitHub Actions","Vercel","Supabase",
+  "Python","SQL","Pandas","FastAPI","Oracle","PostgreSQL",
+  "MariaDB","Power BI","Docker","GitLab CI/CD","Linux","Azure AI",
+  "PHP","TypeScript","React","Next.js","Node.js",
 ];
 
 type ModuleKey = "js" | "php" | "opencode" | "react" | "postgres";
@@ -189,8 +189,8 @@ export function Hero() {
           >
             {[
               { v: "3M+",   k: "Customers served" },
-              { v: "80%",   k: "Manual work removed" },
-              { v: "4 yrs", k: "Shipping in production" },
+              { v: "100%",  k: "On-time compliance" },
+              { v: "4+ yrs", k: "Shipping in production" },
             ].map((m, i) => (
               <div
                 key={m.k}

@@ -10,10 +10,13 @@ import { PERSONAL_PROJECTS, PROFESSIONAL_PROJECTS } from "@/lib/constants";
 const HIDDEN_PROJECTS = ["FishScout", "NDM"];
 
 const LOCAL_IMAGES: Record<string, string> = {
+  "Nayla":         "/projects/nayla.jpg",
   "ChoreQuest":    "/projects/chorequest.png",
   "FridgeBoard":   "/projects/fridgeboard.png",
   "Salasilah":     "/projects/salasilah.png",
   "ApplySmart AI": "/projects/applysmartai.png",
+  "HRPlus Ops":    "/projects/hrplus.svg",
+  "NurseWest BCP": "/projects/nursewest.svg",
   "DREAM":         "/projects/dream.png",
   "FIVE":          "/projects/five.jpg",
   "MSQoS":         "/projects/msqos.jpg",
@@ -24,6 +27,14 @@ function imgSrc(name: string) {
 }
 
 const RAIL_ITEMS: FocusRailItem[] = [
+  ...PROFESSIONAL_PROJECTS.filter((p) => !HIDDEN_PROJECTS.includes(p.name)).map((p) => ({
+    id: p.name,
+    title: p.name,
+    description: p.fullName,
+    meta: "Professional • " + p.impact,
+    imageSrc: imgSrc(p.name),
+    tags: p.tags,
+  })),
   ...PERSONAL_PROJECTS.filter((p) => !HIDDEN_PROJECTS.includes(p.name)).map((p) => ({
     id: p.name,
     title: p.name,
@@ -31,14 +42,7 @@ const RAIL_ITEMS: FocusRailItem[] = [
     meta: "Personal • " + p.tags[0],
     imageSrc: imgSrc(p.name),
     href: p.href,
-    tags: p.tags,
-  })),
-  ...PROFESSIONAL_PROJECTS.filter((p) => !HIDDEN_PROJECTS.includes(p.name)).map((p) => ({
-    id: p.name,
-    title: p.name,
-    description: p.description,
-    meta: "Professional • " + p.impact,
-    imageSrc: imgSrc(p.name),
+    repoHref: "repo" in p ? p.repo : undefined,
     tags: p.tags,
   })),
 ];
@@ -51,10 +55,20 @@ type GridItem = {
   tags: readonly string[];
   type: "Personal" | "Professional";
   href?: string;
+  repoHref?: string;
   imageSrc: string;
 };
 
 const GRID_ITEMS: GridItem[] = [
+  ...PROFESSIONAL_PROJECTS.filter((p) => !HIDDEN_PROJECTS.includes(p.name)).map((p) => ({
+    id: p.name,
+    title: p.name,
+    subtitle: p.fullName,
+    description: p.description,
+    tags: p.tags,
+    type: "Professional" as const,
+    imageSrc: imgSrc(p.name),
+  })),
   ...PERSONAL_PROJECTS.filter((p) => !HIDDEN_PROJECTS.includes(p.name)).map((p) => ({
     id: p.name,
     title: p.name,
@@ -63,15 +77,7 @@ const GRID_ITEMS: GridItem[] = [
     tags: p.tags,
     type: "Personal" as const,
     href: p.href,
-    imageSrc: imgSrc(p.name),
-  })),
-  ...PROFESSIONAL_PROJECTS.filter((p) => !HIDDEN_PROJECTS.includes(p.name)).map((p) => ({
-    id: p.name,
-    title: p.name,
-    subtitle: p.fullName,
-    description: p.description,
-    tags: p.tags,
-    type: "Professional" as const,
+    repoHref: "repo" in p ? p.repo : undefined,
     imageSrc: imgSrc(p.name),
   })),
 ];
@@ -157,17 +163,33 @@ function ProjectCard({ item }: { item: GridItem }) {
           ))}
         </div>
 
-        {item.href && (
-          <a
-            href={item.href}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-1 inline-flex items-center gap-1 text-xs font-medium transition-colors duration-150"
-            style={{ color: "var(--accent)", fontFamily: "var(--font-jb-mono)" }}
-          >
-            View project
-            <ArrowUpRight className="h-3 w-3" />
-          </a>
+        {(item.href || item.repoHref) && (
+          <div className="mt-1 flex items-center gap-4">
+            {item.href && (
+              <a
+                href={item.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 text-xs font-medium transition-colors duration-150"
+                style={{ color: "var(--accent)", fontFamily: "var(--font-jb-mono)" }}
+              >
+                View project
+                <ArrowUpRight className="h-3 w-3" />
+              </a>
+            )}
+            {item.repoHref && (
+              <a
+                href={item.repoHref}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 text-xs font-medium transition-colors duration-150"
+                style={{ color: "var(--muted)", fontFamily: "var(--font-jb-mono)" }}
+              >
+                Source
+                <ArrowUpRight className="h-3 w-3" />
+              </a>
+            )}
+          </div>
         )}
       </div>
     </div>

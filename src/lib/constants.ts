@@ -2,10 +2,10 @@ export const SITE_CONFIG = {
   name: "Hafiy Harizan",
   title: "Hafiy Harizan — Software & Data Engineer",
   description:
-    "Perth-based software engineer and data & analytics engineer with 4+ years of experience across full stack development, data engineering, analytics platforms, automation, and AI-enabled solutions.",
+    "Perth-based software engineer with 4+ years designing, building and running production data platforms, ETL pipelines and backend services. Currently engineering HR data feeds and analytics at WA Health; previously built platforms processing network data for 3M+ customers at Telekom Malaysia.",
   url: "https://hafiyharizan.com",
   email: "hafiyharizan@gmail.com",
-  phone: "+61 0402565496",
+  phone: "+61 402 565 496",
   location: "Perth, Australia",
   linkedin: "https://www.linkedin.com/in/hafiyharizan/",
   github: "https://github.com/hafiyharizan",
@@ -21,6 +21,18 @@ export const NAV_LINKS = [
 ] as const;
 
 export const PERSONAL_PROJECTS = [
+  {
+    name: "Nayla",
+    tagline: "Offline-first Baby Tracker PWA",
+    description:
+      "A phone-first app for logging feeds, diapers, sleep and wake windows, built for one-handed use at 3am. Vanilla JavaScript with no build step: localStorage is the source of truth, and an optional Postgres/PostgREST backend syncs any number of phones paired by QR code, using server-assigned revisions, tombstone deletes and per-entry merging. Self-hostable with Docker Compose and Caddy, covered by Playwright browser tests, with a Python tool that imports old WhatsApp logs.",
+    tags: ["JavaScript", "PWA", "PostgreSQL", "PostgREST", "Docker", "Playwright"],
+    icon: "baby",
+    color: "#b4683c",
+    href: "https://hafiyharizan.github.io/Nayla/",
+    repo: "https://github.com/hafiyharizan/Nayla",
+    featured: true,
+  },
   {
     name: "Salasilah",
     tagline: "Family Tree & Genealogy App",
@@ -91,66 +103,95 @@ export const PERSONAL_PROJECTS = [
 
 export const PROFESSIONAL_PROJECTS = [
   {
+    name: "HRPlus Ops",
+    fullName: "HRPlus Operations Data Pipeline & Dashboard (WA Health)",
+    description:
+      "SQL extracts HR service transactions from Oracle into a Power BI data model. Business rules for backlog, queue ageing and service levels are encoded as reusable DAX measures, giving operations leaders one source of truth for form volumes, processing trends and SLA performance.",
+    impact: "One source of truth for SLA reporting",
+    tags: ["SQL", "Oracle", "Power BI", "DAX", "Data Modelling"],
+    icon: "database",
+  },
+  {
+    name: "NurseWest BCP",
+    fullName: "NurseWest Business Continuity Automation (WA Health)",
+    description:
+      "Python automation that extracts, transforms and delivers the data behind NurseWest's business continuity processes. Replaced manual data handling so operational and workforce outputs are produced reliably and on time.",
+    impact: "Manual data handling replaced",
+    tags: ["Python", "Pandas", "SQL", "Automation"],
+    icon: "shield-check",
+  },
+  {
     name: "DREAM",
     fullName: "Data Repository for Exploratory Analysis and Management",
     description:
-      "Designed a centralised data platform with automated ingestion, transformation, and API-based data access. Reduced data preparation time from hours to minutes through automated ELT pipelines.",
-    impact: "Hours → Minutes data prep time",
-    tags: ["Python", "PostgreSQL", "REST APIs", "ELT", "Power BI"],
+      "A central data platform with automated ingestion and preprocessing pipelines behind a Python FastAPI service layer and a Next.js front end. Cut data retrieval from hours to minutes, serving analysts and engineers clean, analysis-ready datasets on demand.",
+    impact: "Hours → minutes data retrieval",
+    tags: ["Python", "FastAPI", "PostgreSQL", "Next.js", "ETL"],
     icon: "database",
   },
   {
     name: "NDM",
     fullName: "Network Data Mart",
     description:
-      "Built a scalable data mart architecture processing millions of records daily. Implemented fully automated ELT pipelines and scheduled workflows, achieving 100% automated reporting.",
-    impact: "80% manual workload removed",
-    tags: ["SQL", "Python", "ETL Pipelines", "Scheduling", "Tableau"],
+      "A batch ETL data mart with cron-scheduled pipelines ingesting and transforming millions of records a day into reporting tables. Fully automated reports that operational teams previously built by hand.",
+    impact: "Millions of records/day, reports fully automated",
+    tags: ["PHP", "JavaScript", "MariaDB", "SQL", "Cron"],
     icon: "server",
   },
   {
     name: "FIVE",
-    fullName: "Fiber Infrastructure Visualization and Enhancement",
+    fullName: "Fibre Infrastructure Visualisation and Enhancement",
     description:
-      "Developed automated spatial data ingestion pipelines integrating ML-based path optimisation. Enabled analytics and visualisation over nationwide spatial datasets.",
-    impact: "20% planning accuracy improvement",
-    tags: ["FME", "PostGIS", "GeoServer", "Python", "Leaflet.js"],
+      "A spatial data pipeline that ingests and stores GeoPackage datasets through FME and Bash, feeding ML-based shortest-path routing on a Leaflet web map.",
+    impact: "~20% better route-planning accuracy",
+    tags: ["FME", "Bash", "PostgreSQL", "GeoServer", "Leaflet.js"],
     icon: "map",
   },
   {
     name: "MSQoS",
     fullName: "Mandatory Standards for Quality of Service",
     description:
-      "Built an automated compliance monitoring system combining validation logic, monitoring scripts, and secure data pipelines. Ensured regulatory compliance with zero missed deadlines.",
-    impact: "100% timely submissions, 50% less manual work",
-    tags: ["Python", "SQL", "Automation", "Data Quality", "Monitoring"],
+      "A regulatory data pipeline for MCMC reporting, with validation checks, monitoring scripts and secure data delivery.",
+    impact: "100% on-time submissions, ~50% less manual work",
+    tags: ["SQL", "PHP", "Validation", "Monitoring", "Compliance"],
     icon: "shield-check",
   },
 ] as const;
 
 export const EXPERIENCE = [
   {
-    title: "Visualization & Software Engineer",
-    company: "Telekom Malaysia",
-    period: "March 2024 – June 2025",
+    title: "Business Systems Administrator (Data Analyst)",
+    company: "Health Support Services, WA Health",
+    period: "June 2026 – Present",
     description: [
-      "Designed, built, and supported production-grade data pipelines and analytics platforms processing datasets from 3M+ customers.",
-      "Implemented automated data ingestion, transformation (ELT), and validation workflows.",
-      "Developed scalable backend services using Python, PHP, SQL, and REST APIs.",
-      "Integrated machine learning outputs into data pipelines supporting AI-driven analytics.",
-      "Applied DataOps and DevOps practices including CI/CD pipelines and containerisation.",
+      "Designing and building a daily data feed that consolidates approved extended leave from three HR systems, so ICT can pause Microsoft 365 licences and park Teams numbers automatically.",
+      "Designed the GitHub organisation for a 12-analyst team, including repository structure, topic tagging and Power BI version control with .pbip, and took it from pilot to adoption.",
+      "Write SQL against Oracle HR data warehouses and build workforce analytics models covering headcount, FTE, turnover, leave and recruitment.",
+      "Automate data preparation, validation and refresh steps with Python, reducing manual handling in recurring reporting.",
+      "Build Power BI models and DAX for senior leadership and operational teams.",
     ],
   },
   {
-    title: "Network Geospatial Viz Solution Engineer",
+    title: "Visualisation & Software Engineer",
+    company: "Telekom Malaysia",
+    period: "March 2024 – June 2025",
+    description: [
+      "Built data platforms in PHP, JavaScript and SQL that processed operational data from 3M+ customers, improving system stability and speeding up enterprise reporting.",
+      "Automated data ingestion and validation workflows and integrated machine learning outputs into operational dashboards for network diagnostics.",
+      "Applied version control, modular architecture and documentation standards to keep production systems maintainable and secure.",
+      "Added validation logic, access controls and monitoring scripts to support high availability and regulatory compliance.",
+      "Built real-time infrastructure web apps and dashboards with AmCharts and GeoServer, replacing manual reporting.",
+    ],
+  },
+  {
+    title: "Network Geospatial Visualisation Solution Engineer",
     company: "Telekom Malaysia",
     period: "March 2022 – March 2024",
     description: [
-      "Built and optimised cloud-ready analytics datasets and spatial data pipelines.",
-      "Designed and maintained high-performance databases with indexing and query optimisation.",
-      "Automated complex data transformation and orchestration workflows.",
-      "Delivered production dashboards in Power BI and Tableau.",
-      "Deployed and supported analytics services including GeoServer and Tableau Server.",
+      "Automated spatial data processing pipelines with FME and Bash, cutting manual effort for engineering and analytics teams.",
+      "Deployed and managed GeoServer services and Tableau Server, providing secure, reliable access for internal users.",
+      "Tuned PostgreSQL and MariaDB performance through indexing, query optimisation and schema restructuring for large mapping workloads.",
+      "Built geospatial tools and dashboards with Power BI, Tableau and GeoServer for network planning.",
     ],
   },
   {
@@ -178,47 +219,28 @@ export const EDUCATION = [
   },
 ] as const;
 
-export const SKILLS = {
-  "Frontend": [
-    "JavaScript", "TypeScript", "React", "Next.js", "HTML", "CSS", "Tailwind CSS", "Bootstrap",
-  ],
-  "Backend": [
-    "Node.js", "Python", "PHP", "RESTful APIs", "API Integration",
-  ],
-  "Databases": [
-    "PostgreSQL", "MySQL", "MariaDB", "Query Optimization", "Data Modelling", "ELT",
-  ],
-  "AI & Cloud": [
-    "Azure AI Studio", "Azure OpenAI", "Azure ML", "Prompt Engineering", "Model Deployment", "Agentic AI",
-  ],
-  "Data & Viz": [
-    "Power BI", "Tableau", "Leaflet.js", "AmCharts", "Pandas", "NumPy",
-  ],
-  "DevOps & Tools": [
-    "Docker", "Git", "GitHub", "GitLab CI/CD", "Linux CLI", "Agile/Scrum",
-  ],
-} as const;
-
-export const TESTIMONIALS = [
+export const CERTIFICATIONS = [
   {
-    quote:
-      "Hafiy consistently delivered high-quality data solutions that exceeded expectations. His ability to translate complex business requirements into robust technical implementations was impressive.",
-    name: "Placeholder Name",
-    title: "Team Lead, Telekom Malaysia",
-    avatar: null,
-  },
-  {
-    quote:
-      "A rare engineer who understands both the data pipeline and the end-user experience. Hafiy's work on our analytics platform significantly improved our decision-making speed.",
-    name: "Placeholder Name",
-    title: "Senior Manager, Data Analytics",
-    avatar: null,
-  },
-  {
-    quote:
-      "Hafiy brought a unique blend of engineering rigour and creative problem-solving to every project. His automated pipelines saved us countless hours of manual work.",
-    name: "Placeholder Name",
-    title: "Project Manager, Infrastructure",
-    avatar: null,
+    name: "Microsoft Certified: Azure AI Engineer Associate",
+    issuer: "Microsoft",
+    period: "Issued March 2026 · Expires March 2027",
   },
 ] as const;
+
+export const SKILLS = {
+  "Languages": [
+    "Python", "SQL", "PHP", "JavaScript", "TypeScript", "Bash",
+  ],
+  "Data": [
+    "Pandas", "NumPy", "FME", "Power BI (DAX)", "Tableau",
+  ],
+  "Databases": [
+    "Oracle", "PostgreSQL", "MySQL", "MariaDB",
+  ],
+  "Backend & Web": [
+    "FastAPI", "Node.js", "React", "Next.js", "Leaflet.js", "GeoServer",
+  ],
+  "DevOps & Cloud": [
+    "Docker", "Git", "GitHub", "GitLab CI/CD", "Linux", "Azure (OpenAI, ML)",
+  ],
+} as const;

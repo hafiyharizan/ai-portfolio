@@ -28,12 +28,13 @@ const jbMono = JetBrains_Mono({
 export const metadata: Metadata = {
   title: "Hafiy Harizan — Software Engineer",
   description:
-    "Perth-based software engineer and data & analytics engineer with 4+ years of experience across full stack development, data engineering, analytics platforms, automation, and AI-enabled solutions.",
+    "Perth-based software engineer with 4+ years building production data platforms, ETL pipelines and backend services. Currently at WA Health; previously Telekom Malaysia.",
   keywords: [
     "Hafiy Harizan",
     "Software Engineer",
     "Data Engineer",
-    "AI Engineer",
+    "Data Platform",
+    "ETL",
     "Full Stack Developer",
     "Perth",
     "Australia",
@@ -50,14 +51,14 @@ export const metadata: Metadata = {
     locale: "en_AU",
     title: "Hafiy Harizan — Software & Data Engineer",
     description:
-      "Building scalable data platforms and intelligent applications. 4+ years across full stack, data engineering, analytics, and AI.",
+      "Software engineer in Perth building production data platforms, ETL pipelines and backend services. 4+ years across WA Health and Telekom Malaysia.",
     siteName: "Hafiy Harizan",
   },
   twitter: {
     card: "summary_large_image",
     title: "Hafiy Harizan — Software & Data Engineer",
     description:
-      "Building scalable data platforms and intelligent applications. 4+ years across full stack, data engineering, analytics, and AI.",
+      "Software engineer in Perth building production data platforms, ETL pipelines and backend services. 4+ years across WA Health and Telekom Malaysia.",
   },
   robots: { index: true, follow: true },
 };
