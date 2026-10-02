@@ -26,6 +26,14 @@ function imgSrc(name: string) {
 }
 
 const RAIL_ITEMS: FocusRailItem[] = [
+  ...PROFESSIONAL_PROJECTS.filter((p) => !HIDDEN_PROJECTS.includes(p.name)).map((p) => ({
+    id: p.name,
+    title: p.name,
+    description: p.fullName,
+    meta: "Professional • " + p.impact,
+    imageSrc: imgSrc(p.name),
+    tags: p.tags,
+  })),
   ...PERSONAL_PROJECTS.filter((p) => !HIDDEN_PROJECTS.includes(p.name)).map((p) => ({
     id: p.name,
     title: p.name,
@@ -33,14 +41,6 @@ const RAIL_ITEMS: FocusRailItem[] = [
     meta: "Personal • " + p.tags[0],
     imageSrc: imgSrc(p.name),
     href: p.href,
-    tags: p.tags,
-  })),
-  ...PROFESSIONAL_PROJECTS.filter((p) => !HIDDEN_PROJECTS.includes(p.name)).map((p) => ({
-    id: p.name,
-    title: p.name,
-    description: p.description,
-    meta: "Professional • " + p.impact,
-    imageSrc: imgSrc(p.name),
     tags: p.tags,
   })),
 ];
@@ -57,6 +57,15 @@ type GridItem = {
 };
 
 const GRID_ITEMS: GridItem[] = [
+  ...PROFESSIONAL_PROJECTS.filter((p) => !HIDDEN_PROJECTS.includes(p.name)).map((p) => ({
+    id: p.name,
+    title: p.name,
+    subtitle: p.fullName,
+    description: p.description,
+    tags: p.tags,
+    type: "Professional" as const,
+    imageSrc: imgSrc(p.name),
+  })),
   ...PERSONAL_PROJECTS.filter((p) => !HIDDEN_PROJECTS.includes(p.name)).map((p) => ({
     id: p.name,
     title: p.name,
@@ -65,15 +74,6 @@ const GRID_ITEMS: GridItem[] = [
     tags: p.tags,
     type: "Personal" as const,
     href: p.href,
-    imageSrc: imgSrc(p.name),
-  })),
-  ...PROFESSIONAL_PROJECTS.filter((p) => !HIDDEN_PROJECTS.includes(p.name)).map((p) => ({
-    id: p.name,
-    title: p.name,
-    subtitle: p.fullName,
-    description: p.description,
-    tags: p.tags,
-    type: "Professional" as const,
     imageSrc: imgSrc(p.name),
   })),
 ];
