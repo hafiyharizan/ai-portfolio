@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0b1220"/>
+      <stop offset="1" stop-color="#1e1b3a"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="900" fill="url(#bg)"/>
+  <g font-family="ui-monospace, monospace" font-size="30" text-anchor="middle">
+    <rect x="130" y="390" width="230" height="130" rx="18" fill="#1e293b" stroke="#a78bfa" stroke-width="3"/>
+    <text x="245" y="465" fill="#e2e8f0">Extract</text>
+    <rect x="485" y="390" width="230" height="130" rx="18" fill="#1e293b" stroke="#a78bfa" stroke-width="3"/>
+    <text x="600" y="465" fill="#e2e8f0">Transform</text>
+    <rect x="840" y="390" width="230" height="130" rx="18" fill="#1e293b" stroke="#34d399" stroke-width="3"/>
+    <text x="955" y="465" fill="#e2e8f0">Deliver</text>
+  </g>
+  <g stroke="#a78bfa" stroke-width="5" fill="#a78bfa">
+    <line x1="360" y1="455" x2="470" y2="455"/><path d="M470 443 L486 455 L470 467Z" stroke="none"/>
+    <line x1="715" y1="455" x2="825" y2="455"/><path d="M825 443 L841 455 L825 467Z" stroke="none"/>
+  </g>
+  <g transform="translate(600 640)" fill="none" stroke="#34d399" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M-40 0 L-10 30 L45 -30"/>
+  </g>
+  <text x="130" y="180" font-family="ui-sans-serif, system-ui, sans-serif" font-size="64" font-weight="700" fill="#e2e8f0">NurseWest Continuity</text>
+  <text x="130" y="232" font-family="ui-monospace, monospace" font-size="28" fill="#94a3b8">Python automation · business continuity data</text>
+</svg>

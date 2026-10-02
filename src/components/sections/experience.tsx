@@ -6,19 +6,25 @@ import { SectionHeading } from "@/components/ui/section-heading";
 
 const ROLE_META = [
   {
-    idx: "01", year: "2024",
+    idx: "01", year: "2026",
+    metric: "12", metricSub: "analysts moved to Git",
+    highlight: true,
+    tags: ["Python", "SQL", "Oracle", "Power BI", "DAX", "GitHub"],
+  },
+  {
+    idx: "02", year: "2024",
     metric: "3M+", metricSub: "customers served",
     highlight: true,
-    tags: ["Python", "SQL", "Azure AI", "Docker", "CI/CD", "REST API"],
+    tags: ["PHP", "JavaScript", "SQL", "AmCharts", "GeoServer", "ML integration"],
   },
   {
-    idx: "02", year: "2022",
-    metric: "80%", metricSub: "manual work removed",
+    idx: "03", year: "2022",
+    metric: "~20%", metricSub: "better route planning",
     highlight: true,
-    tags: ["PostgreSQL", "Power BI", "Tableau", "GeoServer", "Spatial SQL"],
+    tags: ["FME", "Bash", "PostgreSQL", "MariaDB", "GeoServer", "Tableau"],
   },
   {
-    idx: "03", year: "2021",
+    idx: "04", year: "2021",
     metric: "2021", metricSub: "where it began",
     highlight: false,
     tags: ["Python", "SQL", "Data Analytics"],

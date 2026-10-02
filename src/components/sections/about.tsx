@@ -152,7 +152,8 @@ function Counter({ to, suffix = "" }: { to: number; suffix?: string }) {
   const ref = useRef<HTMLSpanElement>(null);
   const inView = useInView(ref, { once: true, margin: "-60px" });
   const reduced = useReducedMotion();
-  const [val, setVal] = useState(reduced ? to : 0);
+  // Start at the final value so server render, no-JS and link previews never show 0.
+  const [val, setVal] = useState(to);
 
   useEffect(() => {
     if (!inView || reduced) return;
@@ -328,7 +329,7 @@ export function About() {
             >
               About Me
             </p>
-            <AnimatedSummary text="Engineer at the intersection of software and data. I build end-to-end systems — robust pipelines, scalable APIs, and clean interfaces. 4+ years shipping production-grade solutions for 3M+ customers at Telekom Malaysia." />
+            <AnimatedSummary text="Engineer at the intersection of software and data. I build end-to-end systems — robust pipelines, scalable APIs, and clean interfaces. 4+ years in production: data platforms serving 3M+ customers at Telekom Malaysia, and now HR data feeds and analytics at WA Health." />
           </BentoCard>
 
           {/* ── Experience counter ─────────────────────────────────────── */}

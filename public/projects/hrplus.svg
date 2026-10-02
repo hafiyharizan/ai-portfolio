@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0b1220"/>
+      <stop offset="1" stop-color="#132a3a"/>
+    </linearGradient>
+    <linearGradient id="bar" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0" stop-color="#0e7490"/>
+      <stop offset="1" stop-color="#22d3ee"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="900" fill="url(#bg)"/>
+  <g stroke="#ffffff" stroke-opacity="0.06">
+    <path d="M150 300H1050M150 420H1050M150 540H1050M150 660H1050"/>
+  </g>
+  <g fill="url(#bar)">
+    <rect x="190" y="520" width="70" height="140" rx="10"/>
+    <rect x="300" y="460" width="70" height="200" rx="10"/>
+    <rect x="410" y="400" width="70" height="260" rx="10"/>
+    <rect x="520" y="440" width="70" height="220" rx="10"/>
+    <rect x="630" y="360" width="70" height="300" rx="10"/>
+    <rect x="740" y="330" width="70" height="330" rx="10"/>
+    <rect x="850" y="380" width="70" height="280" rx="10"/>
+  </g>
+  <polyline points="225,470 335,430 445,360 555,390 665,320 775,290 885,330" fill="none" stroke="#fbbf24" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <g fill="#fbbf24">
+    <circle cx="225" cy="470" r="9"/><circle cx="335" cy="430" r="9"/><circle cx="445" cy="360" r="9"/>
+    <circle cx="555" cy="390" r="9"/><circle cx="665" cy="320" r="9"/><circle cx="775" cy="290" r="9"/><circle cx="885" cy="330" r="9"/>
+  </g>
+  <text x="150" y="180" font-family="ui-sans-serif, system-ui, sans-serif" font-size="64" font-weight="700" fill="#e2e8f0">HRPlus Operations</text>
+  <text x="150" y="232" font-family="ui-monospace, monospace" font-size="28" fill="#94a3b8">Oracle → SQL → Power BI · backlog · queue ageing · SLA</text>
+  <text x="150" y="770" font-family="ui-monospace, monospace" font-size="24" fill="#64748b">Illustrative, not real data</text>
+</svg>

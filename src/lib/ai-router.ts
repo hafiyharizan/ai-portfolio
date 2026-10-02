@@ -40,7 +40,7 @@ export function isVetoed(input: string): boolean {
 export const CATEGORIES: Record<string, CategoryConfig> = {
   intro: {
     response:
-      "Hafiy Harizan is a software and data engineer based in Perth, Australia, with 4+ years of experience. He specialises in building end-to-end data pipelines, full-stack web applications, and AI-enabled solutions — comfortable across the full stack from React and Next.js on the frontend to Python, SQL, and cloud services on the data and backend layer.",
+      "Hafiy Harizan is a software engineer based in Perth, Australia, with 4+ years designing, building and running production data platforms, ETL pipelines and backend services. He currently works at Health Support Services, WA Health, as a Business Systems Administrator (Data Analyst), building HR data feeds and workforce analytics. Before that he spent four years at Telekom Malaysia building data platforms that processed network data for 3M+ customers. He works mainly in Python, PHP and SQL, with JavaScript and TypeScript front ends.",
     phrases: [
       { text: "who is hafiy", weight: 4 },
       { text: "tell me about hafiy", weight: 4 },
@@ -55,7 +55,7 @@ export const CATEGORIES: Record<string, CategoryConfig> = {
   },
   skills: {
     response:
-      "Hafiy's strongest technical skill is data engineering — specifically designing and building end-to-end ELT pipelines, scalable data platforms, and automated workflows using Python, SQL, and cloud services. He pairs this with strong full-stack development skills in React, Next.js, and TypeScript, making him equally comfortable building the frontend that consumes the data.",
+      "Hafiy's strongest area is data engineering: designing and running ETL pipelines, data platforms and automated validation and reporting workflows in Python, PHP and SQL, on Oracle, PostgreSQL and MariaDB. He also builds the web layer on top, with FastAPI, Node.js, React and Next.js, and ships through Docker and GitLab CI/CD.",
     phrases: [
       { text: "strongest skill", weight: 4 },
       { text: "technical skill", weight: 4 },
@@ -72,7 +72,7 @@ export const CATEGORIES: Record<string, CategoryConfig> = {
   },
   stack: {
     response:
-      "Hafiy's core tech stack includes TypeScript, React, and Next.js for frontend; Python, Node.js, and PHP for backend; PostgreSQL, MySQL, and MariaDB for databases; and Docker, GitLab CI/CD, and Linux for DevOps. On the data and AI side he works with Azure AI Studio, Azure OpenAI, Power BI, Tableau, Pandas, and NumPy.",
+      "Hafiy's core stack: Python, SQL, PHP, JavaScript, TypeScript and Bash; Pandas, NumPy, FME, Power BI (DAX) and Tableau for data work; Oracle, PostgreSQL, MySQL and MariaDB for databases; FastAPI, Node.js, React, Next.js, Leaflet.js and GeoServer for backend and web; and Docker, Git, GitLab CI/CD, Linux and Azure (OpenAI, Machine Learning) for DevOps and cloud.",
     phrases: [
       { text: "tech stack", weight: 4.5 },
       { text: "technology stack", weight: 4.5 },
@@ -91,7 +91,7 @@ export const CATEGORIES: Record<string, CategoryConfig> = {
   },
   projects: {
     response:
-      "Hafiy has built several personal projects: Salasilah (a family tree and genealogy app using Next.js and D3.js), ChoreJoy (a gamified family chore app with React and Node.js), FridgeBoard (a household organization hub as a PWA), an Expense Tracker with rich analytics dashboards, and ApplyAI — an AI-powered job application assistant. Professionally, his flagship project was DREAM (Data Repository for Exploratory Analysis and Management), a centralised data platform at Telekom Malaysia that reduced data preparation time from hours to minutes.",
+      "Professionally, Hafiy's projects include HRPlus Operations (an Oracle-to-Power BI pipeline for HR service SLAs at WA Health), NurseWest business continuity automation in Python (WA Health), and at Telekom Malaysia: DREAM (a data platform with a FastAPI service layer that cut data retrieval from hours to minutes), NDM (a batch ETL data mart processing millions of records a day), MSQoS (a regulatory reporting pipeline with 100% on-time submissions) and FIVE (a spatial data pipeline for fibre route planning). On the side he has built Salasilah (a family tree app), ChoreQuest (a gamified chore app), FridgeBoard, ApplySmart AI and the Surau Elmina Valley community portal.",
     phrases: [
       { text: "personal projects", weight: 4 },
       { text: "what has hafiy built", weight: 4 },
@@ -105,14 +105,16 @@ export const CATEGORIES: Record<string, CategoryConfig> = {
       { text: "built", weight: 1.5 },
       { text: "dream", weight: 3 },
       { text: "salasilah", weight: 3 },
-      { text: "chorejoy", weight: 3 },
+      { text: "chorequest", weight: 3 },
       { text: "fridgeboard", weight: 3 },
-      { text: "applyai", weight: 3 },
+      { text: "applysmart", weight: 3 },
+      { text: "hrplus", weight: 3 },
+      { text: "nursewest", weight: 3 },
     ],
   },
   experience: {
     response:
-      "Hafiy spent 4+ years at Telekom Malaysia in progressively senior engineering roles — starting as a Trainee, moving to Network Geospatial Viz Solution Engineer, and most recently Visualisation & Software Engineer. His work spanned production data pipeline engineering, geospatial analytics, full-stack development, and integrating ML outputs into analytics platforms processing data from 3M+ customers.",
+      "Hafiy currently works at Health Support Services, WA Health (June 2026 to present) as a Business Systems Administrator (Data Analyst), building HR data feeds from Oracle, Python automation and Power BI models, and he set up Git-based version control for a 12-analyst team. Before that he was at Telekom Malaysia from 2021 to June 2025: Trainee, then Network Geospatial Visualisation Solution Engineer (2022–2024), then Visualisation & Software Engineer (2024–2025), building data platforms and ETL pipelines that processed network data for 3M+ customers.",
     phrases: [
       { text: "work experience", weight: 5.5 },
       { text: "where has hafiy worked", weight: 4 },
@@ -120,18 +122,23 @@ export const CATEGORIES: Record<string, CategoryConfig> = {
       { text: "work history", weight: 4 },
       { text: "telekom malaysia", weight: 4.5 },
       { text: "previous role", weight: 3 },
+      { text: "where does he work", weight: 6.5 },
+      { text: "where does hafiy work", weight: 6.5 },
+      { text: "current role", weight: 5.5 },
+      { text: "current job", weight: 5.5 },
     ],
     keywords: [
       { text: "experience", weight: 2 },
       { text: "worked", weight: 1.5 },
       { text: "career", weight: 2 },
       { text: "telekom", weight: 3 },
+      { text: "wa health", weight: 3 },
       { text: "role", weight: 0.5 },
     ],
   },
   contact: {
     response:
-      "Hafiy is based in Perth, Australia, and is actively seeking new opportunities. You can reach him at hafiyharizan@gmail.com or connect on LinkedIn at linkedin.com/in/hafiyharizan. He's open to discussing roles in software engineering, data engineering, and analytics.",
+      "Hafiy is based in Perth, Australia. You can reach him at hafiyharizan@gmail.com or on LinkedIn at linkedin.com/in/hafiyharizan. He's interested in mid to senior software engineering roles on data platform teams in Perth.",
     phrases: [
       { text: "how to contact", weight: 4.5 },
       { text: "how to reach", weight: 4.5 },
@@ -151,7 +158,7 @@ export const CATEGORIES: Record<string, CategoryConfig> = {
   },
   hire: {
     response:
-      "Hafiy brings 4+ years of hands-on experience building production data pipelines processing millions of records daily. He's automated compliance reporting (100% on-time submissions), designed scalable data mart architectures, and integrated ML outputs into analytics workflows. His unique blend of software engineering and data engineering means he builds robust, maintainable systems — not just scripts.",
+      "Hafiy brings 4+ years of building and running production data systems. At Telekom Malaysia he built a data mart processing millions of records a day, automated regulatory reporting to 100% on-time submissions with about 50% less manual work, and built a FastAPI data platform that cut data retrieval from hours to minutes. At WA Health he integrates data from multiple HR systems and led a 12-analyst team's move to Git. He cares about clean, maintainable code and reliable automation.",
     phrases: [
       { text: "why hire hafiy", weight: 4.5 },
       { text: "why should we hire", weight: 4.5 },
@@ -168,7 +175,7 @@ export const CATEGORIES: Record<string, CategoryConfig> = {
   },
   recruiter: {
     response:
-      "Hafiy is based in Perth, Australia, and is actively looking for software or data engineering roles. He has 4+ years of professional experience and is open to discussing requirements, timelines, and opportunities. The best way to reach him is at hafiyharizan@gmail.com.",
+      "Hafiy is based in Perth, Australia, and currently works at WA Health. He's looking for a mid to senior software engineering role on a data platform team and is happy to discuss requirements and timelines. The best way to reach him is at hafiyharizan@gmail.com.",
     phrases: [
       { text: "currently looking", weight: 4 },
       { text: "open to opportunities", weight: 4 },

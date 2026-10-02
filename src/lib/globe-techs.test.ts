@@ -2,12 +2,12 @@ import { describe, it, expect } from "vitest";
 import { GLOBE_TECHS, fibSphereUnit } from "./globe-techs";
 
 describe("GLOBE_TECHS", () => {
-  it("has 13 entries", () => {
-    expect(GLOBE_TECHS).toHaveLength(13);
+  it("has 15 entries", () => {
+    expect(GLOBE_TECHS).toHaveLength(15);
   });
 
   it("each entry has required fields", () => {
-    const validCategories = ["Frontend", "Backend", "Databases", "DevOps", "Design", "Data & Viz", "Cloud"];
+    const validCategories = ["Frontend", "Backend", "Databases", "DevOps", "Design", "Data & Viz", "Cloud", "AI & Cloud"];
     for (const tech of GLOBE_TECHS) {
       expect(tech.name).toBeTruthy();
       expect(validCategories).toContain(tech.cat);
