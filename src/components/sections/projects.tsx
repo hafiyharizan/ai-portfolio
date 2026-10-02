@@ -15,6 +15,7 @@ const LOCAL_IMAGES: Record<string, string> = {
   "FridgeBoard":   "/projects/fridgeboard.png",
   "Salasilah":     "/projects/salasilah.png",
   "ApplySmart AI": "/projects/applysmartai.png",
+  "Surau Elmina Valley": "/projects/surau.jpg",
   "HRPlus Ops":    "/projects/hrplus.svg",
   "NurseWest BCP": "/projects/nursewest.svg",
   "DREAM":         "/projects/dream.png",

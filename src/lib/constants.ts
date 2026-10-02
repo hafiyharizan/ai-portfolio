@@ -3,7 +3,7 @@ export const SITE_CONFIG = {
   title: "Hafiy Harizan — Software & Data Engineer",
   description:
     "Perth-based software engineer with 4+ years designing, building and running production data platforms, ETL pipelines and backend services. Currently engineering HR data feeds and analytics at WA Health; previously built platforms processing network data for 3M+ customers at Telekom Malaysia.",
-  url: "https://hafiyharizan.com",
+  url: "https://hafiy.dev",
   email: "hafiyharizan@gmail.com",
   phone: "+61 402 565 496",
   location: "Perth, Australia",
@@ -92,8 +92,8 @@ export const PERSONAL_PROJECTS = [
     name: "Surau Elmina Valley",
     tagline: "Community Mosque Portal",
     description:
-      "A community web portal for Surau Elmina Valley — featuring announcements, bulletins, gallery, and an AI-powered guide avatar. Built to keep the local surau community informed and connected.",
-    tags: ["Next.js", "TypeScript", "Tailwind CSS", "Supabase"],
+      "The community web portal for Surau Elmina Valley in Malaysia, with announcements, bulletins, a photo gallery, FAQs, and pages for the surau's donation fund and volunteer roles. Built to keep the local surau community informed and connected. In Bahasa Malaysia.",
+    tags: ["Next.js", "TypeScript", "Tailwind CSS", "Vercel"],
     icon: "building-2",
     color: "#0d9488",
     href: "https://www.surauelminavalley.com/",

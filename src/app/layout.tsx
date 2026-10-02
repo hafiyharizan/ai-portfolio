@@ -4,6 +4,7 @@ import { Geist, JetBrains_Mono } from "next/font/google";
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
 import { Atmosphere } from "@/components/atmosphere";
+import { SITE_CONFIG } from "@/lib/constants";
 import {
   APPEARANCE_MODES,
   APPEARANCE_STORAGE_KEY,
@@ -26,6 +27,8 @@ const jbMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_CONFIG.url),
+  alternates: { canonical: "/" },
   title: "Hafiy Harizan — Software Engineer",
   description:
     "Perth-based software engineer with 4+ years building production data platforms, ETL pipelines and backend services. Currently at WA Health; previously Telekom Malaysia.",
@@ -49,6 +52,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_AU",
+    url: SITE_CONFIG.url,
     title: "Hafiy Harizan — Software & Data Engineer",
     description:
       "Software engineer in Perth building production data platforms, ETL pipelines and backend services. 4+ years across WA Health and Telekom Malaysia.",
