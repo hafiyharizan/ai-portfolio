@@ -86,8 +86,25 @@ export function Navbar() {
           ))}
         </ul>
 
-        {/* Right: theme toggle + mobile hamburger */}
-        <div className="flex items-center gap-2">
+        {/* Right: resume + theme toggle + mobile hamburger */}
+        <div className="ml-auto flex items-center gap-2 md:ml-0">
+          <a
+            href={SITE_CONFIG.resumeUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex h-9 items-center gap-1.5 rounded-lg px-3.5 text-sm font-semibold transition-transform duration-200 hover:-translate-y-px"
+            style={{
+              color: "var(--accent-ink)",
+              background: "linear-gradient(135deg, var(--accent), var(--accent-hot))",
+              boxShadow: "0 6px 18px -8px var(--accent)",
+              fontSize: 13,
+            }}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M12 3v12" /><path d="m7 10 5 5 5-5" /><path d="M5 21h14" />
+            </svg>
+            Resume
+          </a>
           <div className="hidden md:block">
             <ThemePicker />
           </div>

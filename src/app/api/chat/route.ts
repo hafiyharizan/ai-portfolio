@@ -15,7 +15,13 @@ const client = new OpenAI({
   apiKey: process.env.GEMINI_API_KEY ?? "",
 });
 
-const MODEL = process.env.GEMINI_MODEL ?? "gemini-2.0-flash-preview-exp";
+// Tried in order. "gemini-flash-latest" is Google's alias for the current Flash
+// model, so it keeps working when individual model versions are retired.
+const MODELS = [
+  ...new Set([process.env.GEMINI_MODEL, "gemini-flash-latest", "gemini-2.5-flash"].filter(Boolean)),
+] as string[];
+
+const UNAVAILABLE_MESSAGE = `The AI assistant is unavailable right now. You can reach Hafiy directly at ${SITE_CONFIG.email}.`;
 
 const SYSTEM_PROMPT = `You are an assistant answering questions about Hafiy Harizan, a software and data engineer based in Perth, Australia.
 Do not claim to be Hafiy. Refer to him in the third person.
@@ -92,21 +98,39 @@ export async function POST(req: NextRequest) {
     .filter(isValidMessage)
     .slice(-6);
 
+  if (!process.env.GEMINI_API_KEY) {
+    console.error("[chat/route] GEMINI_API_KEY is not set");
+    return new Response(UNAVAILABLE_MESSAGE, { status: 503 });
+  }
+
+  const messages = [
+    { role: "system" as const, content: SYSTEM_PROMPT },
+    ...validHistory,
+    { role: "user" as const, content: message },
+  ];
+
   try {
-    const stream = await client.chat.completions.create({
-      model: MODEL,
-      stream: true,
-      messages: [
-        { role: "system", content: SYSTEM_PROMPT },
-        ...validHistory,
-        { role: "user", content: message },
-      ],
-    });
+    let stream: Awaited<ReturnType<typeof createStream>> | undefined;
+    let lastErr: unknown;
+    for (const model of MODELS) {
+      try {
+        stream = await createStream(model, messages);
+        break;
+      } catch (err) {
+        lastErr = err;
+        const status = (err as { status?: number }).status;
+        console.error("[chat/route]", model, status ?? "", err instanceof Error ? err.message : err);
+        // Rate limits and server errors won't be fixed by another model name.
+        if (status === 429 || (status !== undefined && status >= 500)) break;
+      }
+    }
+    if (!stream) throw lastErr;
+    const completion = stream;
 
     const encoder = new TextEncoder();
     const readable = new ReadableStream({
       async start(controller) {
-        for await (const chunk of stream) {
+        for await (const chunk of completion) {
           const text = chunk.choices[0]?.delta?.content ?? "";
           if (text) controller.enqueue(encoder.encode(text));
         }
@@ -119,11 +143,20 @@ export async function POST(req: NextRequest) {
     });
   } catch (err: unknown) {
     const status = (err as { status?: number }).status;
-    const errMessage = err instanceof Error ? err.message : "AI request failed";
-    console.error("[chat/route]", status ?? "", errMessage);
     if (status === 429) {
       return new Response("Rate limit reached — please wait a moment and try again.", { status: 429 });
     }
-    return new Response(errMessage || "AI request failed", { status: 502 });
+    // Upstream details stay in the server log; visitors get a friendly message.
+    if (status === 400 || status === 401 || status === 403) {
+      console.error("[chat/route] Gemini rejected the request — check GEMINI_API_KEY is valid and GEMINI_MODEL (if set) exists.");
+    }
+    return new Response(UNAVAILABLE_MESSAGE, { status: 502 });
   }
+}
+
+function createStream(
+  model: string,
+  messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[]
+) {
+  return client.chat.completions.create({ model, stream: true, messages });
 }

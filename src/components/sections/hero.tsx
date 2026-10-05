@@ -240,6 +240,25 @@ export function Hero() {
               <span className="transition-transform duration-200 group-hover:translate-x-[3px]">→</span>
             </a>
 
+            <a
+              href={SITE_CONFIG.resumeUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group inline-flex h-[46px] items-center gap-2 rounded-[10px] border px-5 text-sm font-medium transition-all duration-200 hover:-translate-y-px"
+              style={{
+                color: "var(--accent)",
+                borderColor: "var(--accent-line)",
+                background: "var(--accent-soft)",
+                letterSpacing: "-0.005em",
+              }}
+            >
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z" /><path d="M14 3v5h5" /><path d="M9 13h6M9 17h4" />
+              </svg>
+              Resume
+              <span className="transition-transform duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5">↗</span>
+            </a>
+
             <button
               onClick={() => setModalOpen(true)}
               className="relative inline-flex h-[46px] items-center gap-2.5 overflow-hidden rounded-[10px] border px-5 text-sm font-medium transition-all duration-200 hover:-translate-y-px"
@@ -272,16 +291,6 @@ export function Hero() {
               Ask my AI
             </button>
 
-            <a
-              href={SITE_CONFIG.resumeUrl}
-              download
-              className="inline-flex h-[46px] items-center px-3.5 text-sm transition-colors duration-200"
-              style={{ fontFamily: "var(--font-jb-mono)", fontSize: 13, color: "var(--muted)" }}
-              onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.color = "var(--foreground)")}
-              onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.color = "var(--muted)")}
-            >
-              resume.pdf ↗
-            </a>
           </div>
 
           {/* Stack ticker — hide on very small screens */}
